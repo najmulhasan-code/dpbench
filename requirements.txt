@@ -1,0 +1,10 @@
+# Core dependencies
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Multi-agent orchestration
+langgraph>=0.2.0
+langchain-openai>=0.2.0
+
+# Environment config
+python-dotenv>=1.0.0
