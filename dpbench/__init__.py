@@ -25,7 +25,7 @@ from dpbench.core.environment import (
 )
 from dpbench.models.base import ModelFunction, validate_model_function
 from dpbench.config.prompts import TEMPLATE_VARIABLES, get_template_variables
-from dpbench.evaluation.metrics import compute_aggregate_metrics, print_results
+from dpbench.evaluation.metrics import compute_aggregate_metrics
 from dpbench.runner import run_episode, run_experiment
 
 __all__ = [
@@ -52,7 +52,6 @@ __all__ = [
     "TEMPLATE_VARIABLES",
     "get_template_variables",
     "compute_aggregate_metrics",
-    "print_results",
     "run_episode",
     "run_experiment",
 ]

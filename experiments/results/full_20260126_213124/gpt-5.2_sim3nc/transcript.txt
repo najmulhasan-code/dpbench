@@ -1,0 +1,3303 @@
+================================================================================
+DPBench Experiment Transcript
+Started: 2026-01-26T22:52:33.165571
+Config: simultaneous, 3 philosophers, communication=disabled
+================================================================================
+
+
+================================================================================
+Episode 0
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; I’ll pick up one fork to begin eating while still allowing coordination next turn to avoid deadlock."
+       Latency: 1186ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, so I should grab one now; taking the right fork is a symmetric first step toward acquiring both without waiting."
+       Latency: 1090ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to minimize deadlock risk, I’ll pick up one fork first and then attempt the other next turn."
+       Latency: 1237ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available, so I should take it now to eat and avoid holding only one fork longer than necessary."
+       Latency: 1234ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; taking it lets me hold both forks and eat immediately, reducing deadlock risk and increasing throughput."
+       Latency: 1249ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick up either without blocking or causing contention. Waiting avoids deadlock pressure and gives others time to finish and release."
+       Latency: 2980ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m already eating and holding both forks; to avoid blocking others and prevent deadlock risk, I should finish and release both forks now."
+       Latency: 1119ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken, so I can’t eat. Holding one fork while waiting risks deadlock and blocks my neighbor; releasing improves overall progress and fairness."
+       Latency: 1405ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids contributing to deadlock and keeps the system stable until a fork is released."
+       Latency: 1260ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,R) P1=HUNGRY(0,R) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I’ll pick up one fork first to start eating, and I’ll choose the right fork as a consistent convention to reduce deadlock risk if others use opposite ordering."
+       Latency: 1227ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; taking one now moves me toward eating. To reduce deadlock risk, I’ll start by taking my right fork (a consistent ordering can help)."
+       Latency: 1950ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to minimize deadlock risk, I’ll follow a consistent order and pick up my right fork first."
+       Latency: 1139ms
+
+
+--------------------------------------------------------------------------------
+Episode 0 Result: DEADLOCK at timestep 4
+  Meals: [1, 0, 0]
+  Throughput: 0.250
+  Fairness: 0.000
+
+
+================================================================================
+Episode 1
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [free] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I’ll take one fork to start eating while keeping symmetry-breaking (take right first) to reduce deadlock risk if others follow a left-first rule."
+       Latency: 1498ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I’ll take the right fork first to reduce the chance of symmetric deadlock if others default to taking their left."
+       Latency: 1273ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork first and then aim to acquire the other next turn if still free."
+       Latency: 1653ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [P0] [P0] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; taking it lets me hold both and eat immediately, then both will be released, avoiding deadlock and improving throughput."
+       Latency: 1800ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork but my left fork is taken, so holding one fork risks deadlock and blocks others. I should release to keep the system moving and try again later."
+       Latency: 1614ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is already taken, so I can’t complete a pair. Grabbing the right fork now would risk contributing to deadlock or blocking a neighbor unnecessarily. I’ll wait for the left fork to become available."
+       Latency: 1383ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m already eating and holding both forks; to prevent blocking neighbors and maintain fairness, I should finish and release both forks now."
+       Latency: 1045ms
+
+  [P1] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t eat yet. If I grab the right fork now, I risk contributing to a deadlock pattern where everyone holds one fork and waits. Better to wait until the left fork becomes available so I can take both in sequence."
+       Latency: 1822ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now would risk contributing to deadlock (I’d hold one fork while waiting). To stay safe and fair, I’ll wait until both forks are available before grabbing."
+       Latency: 2191ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,L) P2=HUNGRY(0)
+  Forks: [P0] [P1] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and I’m holding none; I can safely start by taking one fork to work toward eating without blocking release logic. I’ll take the left first (consistent ordering helps avoid deadlock if others do the same)."
+       Latency: 1558ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock I’ll take one fork first (left) and then try for the right next turn."
+       Latency: 1091ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both forks are available, but grabbing one immediately can contribute to deadlock if others do the same. I’ll wait briefly to reduce the chance of everyone holding one fork at once and improve fairness."
+       Latency: 1612ms
+
+Timestep 5:
+
+  Table: P0=HUNGRY(1) P1=EATING(1,LR) P2=HUNGRY(0)
+  Forks: [free] [P1] [P1]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m holding my left fork but my right fork is taken, so I can’t eat. To avoid contributing to a deadlock and to improve overall throughput and fairness, I should release my fork and try again later."
+       Latency: 1207ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat now and reduces the chance I’m stuck holding one fork while waiting."
+       Latency: 1605ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now risks contributing to deadlock by holding one fork while waiting. I’ll wait until the right fork becomes available so I can take both in sequence."
+       Latency: 1489ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now risks contributing to deadlock (I’d hold one fork while waiting). To keep the system moving and fair, I’ll wait until both forks are available before grabbing."
+       Latency: 1407ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m already eating and holding both forks; after eating I should release them so others can proceed and we avoid blocking."
+       Latency: 1433ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t acquire both forks. Grabbing the right fork now risks contributing to deadlock if others also hold one fork and wait. I’ll wait for the left fork to become available."
+       Latency: 1570ms
+
+Timestep 7:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both adjacent forks are available, so I can start acquiring them; taking the left fork first is safe as long as I proceed to take the right next and release if blocked to avoid deadlock."
+       Latency: 1698ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both adjacent forks are available; taking one now risks contributing to deadlock if others do the same. To reduce deadlock risk, I’ll attempt to acquire both by starting with the right fork (a consistent ordering helps)."
+       Latency: 1592ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "To avoid deadlock, I’ll follow an asymmetric rule: pick up my right fork first (so not everyone reaches for the same side first). Both forks are available, so I should start by taking one."
+       Latency: 1392ms
+
+Timestep 8:
+
+  Table: P0=EATING(2,LR) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat immediately and then I’ll release both, avoiding deadlock and improving throughput."
+       Latency: 1213ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; grabbing it lets me hold both forks and eat immediately, then I’ll release them automatically, avoiding deadlock and improving throughput."
+       Latency: 1441ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids unnecessary contention and reduces the chance of deadlock while I monitor for a fork becoming available."
+       Latency: 1500ms
+
+Timestep 9:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished this eating turn; releasing both forks promptly prevents blocking neighbors and supports fairness and throughput."
+       Latency: 1102ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is taken, so I can’t eat. Holding one fork risks contributing to deadlock and blocks my neighbor. I should release to keep the system moving and improve fairness."
+       Latency: 1998ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either will fail. Waiting avoids creating contention and helps prevent deadlock while others finish and release."
+       Latency: 1268ms
+
+Timestep 10:
+
+  Table: P0=HUNGRY(2,L) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, so I can safely acquire one now and aim to take the other immediately next turn, minimizing contention while making progress toward eating."
+       Latency: 1346ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both adjacent forks are available and I’m holding none, so I should acquire one to move toward eating; I’ll take the right fork to reduce the chance of symmetric deadlock if others default to taking their left."
+       Latency: 2014ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are currently available; to avoid deadlock, I’ll pick up one fork first and then attempt the other next turn."
+       Latency: 1455ms
+
+Timestep 11:
+
+  Table: P0=EATING(3,LR) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat now and then I’ll release both, improving throughput without risking deadlock."
+       Latency: 1752ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; taking it lets me hold both and eat immediately, reducing wait time and avoiding deadlock risk from holding only one fork."
+       Latency: 1204ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either will fail. Waiting avoids adding contention and reduces deadlock risk while others finish and release."
+       Latency: 1325ms
+
+Timestep 12:
+
+  Table: P0=HUNGRY(3) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m currently eating while holding both forks; to prevent blocking neighbors and keep the system moving fairly, I should finish this turn and release both forks."
+       Latency: 1435ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is taken, so I can’t eat. Holding one fork risks contributing to deadlock and blocks my neighbor; releasing helps overall progress and fairness."
+       Latency: 1862ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids unnecessary contention and reduces deadlock risk while forks are unavailable."
+       Latency: 1121ms
+
+Timestep 13:
+
+  Table: P0=HUNGRY(3,R) P1=HUNGRY(1,R) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I can safely take one now and then aim to take the other next turn, minimizing idle time without risking deadlock if I avoid holding a single fork too long. I’ll start by taking the right fork."
+       Latency: 1839ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, so I can safely take one now and then try to take the other next turn; I’ll take the right fork to break symmetry and reduce deadlock risk."
+       Latency: 1529ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I’ll take one to move toward eating, but to reduce deadlock risk I’ll start by taking my right fork (a consistent asymmetry can help prevent everyone grabbing the same-side fork first)."
+       Latency: 1467ms
+
+
+--------------------------------------------------------------------------------
+Episode 1 Result: DEADLOCK at timestep 13
+  Meals: [3, 1, 0]
+  Throughput: 0.308
+  Fairness: 0.250
+
+
+================================================================================
+Episode 2
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock I’ll start by taking one fork (left) and then try to acquire the right next turn."
+       Latency: 1273ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll take one fork first and then try to acquire the other next turn. I’ll start with the right fork."
+       Latency: 1821ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "To avoid deadlock, I’ll follow a consistent ordering rule: pick up the right fork first. Both forks are available, so I can safely start by grabbing the right fork."
+       Latency: 1349ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat now and reduces waiting, without increasing deadlock risk since I’ll release both after eating."
+       Latency: 1219ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available, so I should take it now to get both forks and eat, minimizing wait and reducing deadlock risk."
+       Latency: 1273ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick either up. Trying to grab would fail; releasing is irrelevant since I hold nothing. Best is to wait to avoid contention and deadlock escalation."
+       Latency: 1494ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m currently eating and already have both forks; to prevent others from waiting and to keep the system moving fairly, I should finish and release both forks now."
+       Latency: 1213ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken, so I can’t eat. Holding one fork while waiting increases deadlock risk and blocks neighbors; I should release to keep the system moving fairly."
+       Latency: 1359ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids unnecessary contention and helps prevent deadlock while others finish and release."
+       Latency: 1366ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,L) P2=HUNGRY(0)
+  Forks: [P0] [P1] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; I’ll pick up one fork to begin eating while avoiding deadlock later by not holding it indefinitely if I can’t get the other."
+       Latency: 1329ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork first and then attempt the other next turn if still available."
+       Latency: 1220ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll take one fork (right) and then try to take the other next turn."
+       Latency: 1208ms
+
+Timestep 5:
+
+  Table: P0=HUNGRY(1) P1=EATING(1,LR) P2=HUNGRY(0)
+  Forks: [free] [P1] [P1]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m holding my left fork but my right fork is taken, so I can’t eat. Continuing to hold the left fork risks contributing to deadlock and unfairness. Releasing frees it for neighbors and improves overall progress."
+       Latency: 2210ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat now and then I’ll release both, minimizing deadlock risk and improving throughput."
+       Latency: 1217ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left would risk contributing to deadlock (I’d hold one fork while waiting indefinitely). To keep the system moving and stay fair, I’ll wait until both forks are available before picking any up."
+       Latency: 1463ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now would risk contributing to deadlock and doesn’t let me eat yet. I’ll wait for the right fork to become available before attempting to pick up any fork."
+       Latency: 1517ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’ve finished eating and should release both forks so neighbors can proceed, preventing contention and promoting fairness."
+       Latency: 1027ms
+
+  [P2] Action: WAIT
+       Reasoning: "Left fork is currently taken, so I can’t acquire both forks. Grabbing the right fork now risks contributing to deadlock if others do the same while waiting on their left. I’ll wait for the left fork to become available."
+       Latency: 1572ms
+
+Timestep 7:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(1,L) P2=HUNGRY(0)
+  Forks: [P0] [P1] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; I’ll take one fork to start eating, and we can avoid deadlock by releasing if I can’t get the second promptly."
+       Latency: 1038ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork first and aim to acquire the other next turn if still free."
+       Latency: 2104ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll take the right fork first (asymmetric pickup order)."
+       Latency: 1014ms
+
+Timestep 8:
+
+  Table: P0=HUNGRY(1) P1=EATING(2,LR) P2=HUNGRY(0)
+  Forks: [free] [P1] [P1]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m holding my left fork but my right fork is taken, so I can’t eat. Holding one fork risks deadlock and blocks my neighbor; releasing improves overall progress and fairness."
+       Latency: 1768ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "I already have my left fork; with the right fork available, I should take it now to eat and then release both, avoiding deadlock and keeping throughput high."
+       Latency: 1279ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now risks contributing to deadlock and doesn’t let me eat. I’ll wait for the right fork to become available before picking anything up."
+       Latency: 1658ms
+
+Timestep 9:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(2) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now risks creating/maintaining a deadlock pattern where I hold one fork and wait indefinitely. To avoid blocking neighbors and improve overall throughput, I’ll wait until both forks are available before attempting to pick any up."
+       Latency: 1799ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’ve finished this eating turn and should release both forks promptly so neighbors can proceed, preventing bottlenecks and improving fairness."
+       Latency: 1247ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t complete a pair. Grabbing the right fork now risks contributing to deadlock (I’d hold one fork while waiting indefinitely). Better to wait until both forks are available."
+       Latency: 1341ms
+
+Timestep 10:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(2,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, so I can safely take one now and aim to take the other next to start eating without risking deadlock by holding only one indefinitely. I’ll take the left fork first."
+       Latency: 1706ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, so I can safely start by taking one. To reduce deadlock risk via asymmetry, I’ll pick up my right fork first."
+       Latency: 1180ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork and then aim to quickly take the other if it stays free."
+       Latency: 1282ms
+
+Timestep 11:
+
+  Table: P0=EATING(2,LR) P1=HUNGRY(2,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available, so I should take it now to eat and avoid holding one fork unnecessarily."
+       Latency: 1214ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; taking it lets me eat now and frees both afterward, improving throughput without risking deadlock."
+       Latency: 1167ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids unnecessary contention and reduces deadlock risk while I monitor for a fork becoming available."
+       Latency: 1175ms
+
+Timestep 12:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(2) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished this eating turn and should release both forks promptly so neighbors can proceed, avoiding blocking and improving fairness/throughput."
+       Latency: 1202ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is currently taken, so I can’t complete a pair to eat. Holding one fork while waiting increases deadlock risk and reduces overall throughput; releasing lets neighbors proceed and improves fairness."
+       Latency: 1726ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick either up. Waiting avoids creating contention and helps prevent deadlock while others finish and release."
+       Latency: 1307ms
+
+Timestep 13:
+
+  Table: P0=HUNGRY(2,R) P1=HUNGRY(2,R) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available and I’m holding none, so I should take one fork now to move toward eating. To reduce deadlock risk with neighbors, I’ll start by taking my right fork (a consistent asymmetry helps)."
+       Latency: 1921ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, so I should take one. To reduce deadlock risk, I’ll follow an asymmetric rule (P1 grabs right first)."
+       Latency: 1216ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork first and then try for the other next turn. I’ll start with my right fork."
+       Latency: 1509ms
+
+
+--------------------------------------------------------------------------------
+Episode 2 Result: DEADLOCK at timestep 13
+  Meals: [2, 2, 0]
+  Throughput: 0.308
+  Fairness: 0.500
+
+
+================================================================================
+Episode 3
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; I’ll take one now and aim to take the other next turn to start eating quickly."
+       Latency: 1315ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; grabbing one risks deadlock if others do the same. Start by taking the right fork (a consistent asymmetric policy helps prevent circular wait)."
+       Latency: 1471ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "To reduce deadlock risk, I’ll follow an ordered strategy: pick up my right fork first so not everyone grabs the same side simultaneously."
+       Latency: 1236ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat now and release both, avoiding deadlock and increasing total throughput."
+       Latency: 1234ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; grabbing it lets me hold both forks and eat immediately, improving throughput and avoiding deadlock risk from waiting while holding one fork."
+       Latency: 1862ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick up either. Waiting avoids creating contention and helps prevent deadlock while others finish and release."
+       Latency: 1438ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished eating and should release both forks immediately to prevent blocking others and avoid deadlock."
+       Latency: 1113ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken, so I can’t eat. Holding one fork while waiting increases deadlock risk and blocks neighbors; I should release and retry later."
+       Latency: 1384ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick up either without blocking. Waiting avoids contributing to deadlock and keeps things fair until a fork is released."
+       Latency: 1391ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,L) P2=HUNGRY(0)
+  Forks: [P0] [P1] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, so I can safely start acquiring them; to reduce deadlock risk, I’ll pick up one fork and then immediately try for the other next turn."
+       Latency: 1571ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork first and then try to acquire the other next turn."
+       Latency: 1771ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up one fork and then aim to acquire the other next turn, releasing if I can’t get it promptly."
+       Latency: 1436ms
+
+Timestep 5:
+
+  Table: P0=HUNGRY(1) P1=EATING(1,LR) P2=HUNGRY(0)
+  Forks: [free] [P1] [P1]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m holding my left fork but my right fork is taken, so I can’t eat. To avoid contributing to deadlock and to keep forks circulating for fairness, I should release what I’m holding and try again later."
+       Latency: 1596ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat immediately and reduces time holding a single fork, helping avoid deadlock."
+       Latency: 1280ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left now risks contributing to deadlock and won’t let me eat anyway. I’ll wait for the right fork to become available before attempting to acquire both in a safe order."
+       Latency: 1698ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork would risk contributing to deadlock if others are similarly holding one fork. To stay deadlock-free and fair, I’ll wait until the right fork becomes available before attempting to pick up both in sequence."
+       Latency: 1979ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m already eating and holding both forks; to avoid blocking others and improve fairness/throughput, I should finish and release them."
+       Latency: 1399ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is already taken, so I can’t complete a pair. Grabbing the right fork now could contribute to deadlock and reduce fairness, so I’ll wait until both are available."
+       Latency: 1597ms
+
+Timestep 7:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, so I should take one now and then take the other next turn to start eating, while keeping coordination simple. I’ll start with my left fork as a consistent rule."
+       Latency: 1583ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I’ll take one now to move toward eating while keeping symmetry-breaking consistent by always taking my right fork first to reduce deadlock risk if others do the same differently."
+       Latency: 3055ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll take one fork first and then aim to take the other next turn if still free."
+       Latency: 1335ms
+
+Timestep 8:
+
+  Table: P0=EATING(2,LR) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available, so I should take it now to eat and avoid any chance of deadlock from holding only one fork."
+       Latency: 1149ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already have the right fork; the left fork is available, so I should take it now to eat and then release both, minimizing time holding a single fork and reducing deadlock risk."
+       Latency: 1424ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so any grab would fail. Waiting avoids unnecessary contention and reduces deadlock risk while others complete and release."
+       Latency: 1245ms
+
+Timestep 9:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m already eating and holding both forks; to prevent blocking others and avoid deadlock, I should finish and release both forks now."
+       Latency: 1274ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork but my left fork is taken, so I can’t eat. Holding one fork while waiting risks contributing to deadlock and unfairly blocking my neighbor, so I should release and retry later."
+       Latency: 1715ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. To avoid contributing to deadlock and to be fair, I should wait until at least one fork becomes available."
+       Latency: 1331ms
+
+Timestep 10:
+
+  Table: P0=HUNGRY(2,L) P1=HUNGRY(1,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and I’m holding none; taking one fork now advances toward eating while still allowing coordination next turn to avoid deadlock if neighbors contend."
+       Latency: 1488ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up one fork first and aim to take the second immediately next turn if still available."
+       Latency: 1126ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll take one fork now and aim to take the other next, releasing if contention arises."
+       Latency: 1088ms
+
+
+--------------------------------------------------------------------------------
+Episode 3 Result: DEADLOCK at timestep 10
+  Meals: [2, 1, 0]
+  Throughput: 0.300
+  Fairness: 0.333
+
+
+================================================================================
+Episode 4
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; I’ll start by picking up one fork to progress toward eating, and we can avoid deadlock by not holding a single fork indefinitely if the second isn’t obtainable next. I’ll take the left fork first."
+       Latency: 1607ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are currently available; taking one fork now moves me toward eating. To reduce deadlock risk, I’ll start by taking my right fork (a consistent ordering strategy)."
+       Latency: 1815ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "To avoid deadlock, I’ll follow an asymmetric rule: try to pick up the right fork first so not everyone grabs the same side simultaneously. Both forks are available, so I’ll start by taking the right fork."
+       Latency: 1454ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and the right fork is available; taking it lets me eat now and then I’ll release both, improving throughput without risking deadlock this turn."
+       Latency: 1374ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; taking it lets me secure both forks and eat immediately, reducing contention and avoiding deadlock."
+       Latency: 1304ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either will fail. Waiting avoids contributing to deadlock and lets the system progress until a fork is released."
+       Latency: 1237ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished eating and should release both forks so adjacent philosophers can proceed, preventing deadlock and improving fairness."
+       Latency: 1179ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is taken, so I can’t eat yet. To avoid contributing to a deadlock pattern where everyone holds one fork, I should release my fork and retry later."
+       Latency: 1347ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick either up. Waiting avoids pointless grabs and reduces contention, helping prevent deadlock and keeping things fair until a fork is released."
+       Latency: 1523ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,R) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [free] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll start by taking my right fork (and will only proceed to take the left if it remains available next turn)."
+       Latency: 1499ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "To reduce deadlock risk, I’ll follow an asymmetric rule: P1 picks up the right fork first. Both forks are available, so I can start by grabbing the right."
+       Latency: 1465ms
+
+  [P2] Action: WAIT
+       Reasoning: "To reduce deadlock risk, I’ll avoid grabbing a single fork immediately; waiting lets neighbors potentially complete a full grab-and-eat cycle, and I can attempt a coordinated two-fork acquisition next turn."
+       Latency: 1714ms
+
+Timestep 5:
+
+  Table: P0=EATING(2,LR) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [P0] [P0] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork, and my left fork is available; taking it lets me eat now and avoids waiting while keeping progress and throughput high."
+       Latency: 1357ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork but my left fork is taken; holding one fork while waiting risks deadlock and blocks neighbors. I should release to improve liveness and fairness."
+       Latency: 1147ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is already taken, so I can’t eat yet. Grabbing the right fork now risks contributing to deadlock if others also hold one fork while waiting. I’ll wait for the left fork to become available."
+       Latency: 1465ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished eating and should release both forks immediately so neighbors can proceed, preventing contention and improving fairness."
+       Latency: 1210ms
+
+  [P1] Action: WAIT
+       Reasoning: "My left fork is unavailable, so I can’t eat yet. Grabbing the right fork now risks contributing to deadlock if others do the same while waiting on their left. I’ll wait until I can acquire both without blocking the system."
+       Latency: 1631ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is taken, so grabbing the left now risks contributing to deadlock if everyone holds one fork. I’ll wait until the right fork becomes available, then try to take both in sequence."
+       Latency: 1324ms
+
+Timestep 7:
+
+  Table: P0=HUNGRY(2,R) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [free] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available and I’m holding none; taking one fork now moves me toward eating, and choosing the right fork first helps break symmetry to reduce deadlock risk."
+       Latency: 1416ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk I’ll pick up one fork first (right), then attempt the other next turn if still free."
+       Latency: 1506ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to minimize deadlock risk, I’ll pick up one fork first and then attempt the other next turn."
+       Latency: 1597ms
+
+Timestep 8:
+
+  Table: P0=EATING(3,LR) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [P0] [P0] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; taking it lets me eat now and quickly release both, improving throughput and avoiding deadlock."
+       Latency: 1362ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken, so I can’t eat. To avoid contributing to a deadlock pattern (everyone holding one fork), I should release and retry later."
+       Latency: 1233ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t complete a pair. Grabbing the right fork now risks contributing to deadlock if others do the same. Best to wait until the left becomes available, then attempt to take both in sequence."
+       Latency: 1471ms
+
+Timestep 9:
+
+  Table: P0=HUNGRY(3) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m currently eating and already holding both forks; to prevent blocking neighbors and improve fairness/throughput, I should finish and release both forks now."
+       Latency: 1426ms
+
+  [P1] Action: WAIT
+       Reasoning: "My left fork is currently taken so I can’t start eating. Grabbing the right fork alone risks contributing to deadlock if others do the same, so I’ll wait for the left fork to become available."
+       Latency: 1315ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left now would risk a deadlock pattern (each philosopher holding one fork). I’ll wait until the right fork becomes available so I can acquire both without blocking others."
+       Latency: 1974ms
+
+Timestep 10:
+
+  Table: P0=HUNGRY(3,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, so I can safely acquire one now and then the other next turn without waiting. I’ll start by taking my left fork."
+       Latency: 1317ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; taking one now increases progress toward eating. To reduce deadlock risk, I’ll take my right fork (assuming a consistent asymmetric strategy among philosophers)."
+       Latency: 1647ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up one fork first and be ready to release if I can’t quickly acquire the other."
+       Latency: 1463ms
+
+Timestep 11:
+
+  Table: P0=EATING(4,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; grabbing it lets me eat immediately and then release both, improving throughput without risking deadlock."
+       Latency: 1390ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; grabbing it lets me acquire both forks and eat immediately, minimizing wait and reducing deadlock risk."
+       Latency: 1485ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids contributing to contention and reduces deadlock risk while I have no forks held."
+       Latency: 1144ms
+
+Timestep 12:
+
+  Table: P0=HUNGRY(4) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m currently eating and holding both forks; to prevent blocking neighbors and reduce deadlock risk, I should finish and release both forks now."
+       Latency: 1213ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken, so I can’t eat. Holding one fork while waiting risks contributing to deadlock, so I should release to let others proceed and retry later."
+       Latency: 1446ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick either up. Waiting avoids unnecessary contention and reduces deadlock risk."
+       Latency: 1503ms
+
+Timestep 13:
+
+  Table: P0=HUNGRY(4,L) P1=HUNGRY(0,L) P2=HUNGRY(0)
+  Forks: [P0] [P1] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and I’m holding none; taking one fork quickly increases the chance I can secure the second and eat. I’ll take the left fork first as a consistent ordering to reduce deadlock risk."
+       Latency: 1853ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock I’ll take one fork now and only proceed to take the second if it remains available next turn, otherwise I’ll release and retry."
+       Latency: 1448ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up one fork first and then try for the other next turn."
+       Latency: 1434ms
+
+Timestep 14:
+
+  Table: P0=HUNGRY(4) P1=EATING(1,LR) P2=HUNGRY(0)
+  Forks: [free] [P1] [P1]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m holding my left fork but my right fork is taken, so I can’t eat. Continuing to hold the left fork increases deadlock risk and blocks my neighbor; releasing promotes progress and fairness."
+       Latency: 1251ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat immediately and then I’ll release both, avoiding deadlock and improving throughput."
+       Latency: 1423ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now risks contributing to deadlock (I’d be holding one fork while waiting). I’ll wait until the right fork becomes available, then try to acquire both in sequence."
+       Latency: 1861ms
+
+Timestep 15:
+
+  Table: P0=HUNGRY(4) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now risks contributing to deadlock or blocking my neighbor without letting me eat. I’ll wait until the right fork becomes available, then attempt to take both in sequence."
+       Latency: 1599ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’ve finished eating and should release both forks immediately so neighbors can proceed and we avoid blocking or deadlock."
+       Latency: 1013ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t complete a pair. Grabbing the right fork now risks contributing to deadlock (holding one fork while waiting). I’ll wait for the left fork to become available."
+       Latency: 1454ms
+
+Timestep 16:
+
+  Table: P0=HUNGRY(4,L) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and I’m holding none, so I can safely start eating by taking one fork now; I’ll take the left first as a consistent policy to avoid hesitation."
+       Latency: 1346ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, so I can safely pick one up now and aim to take the other next; I’ll start with the right fork to reduce symmetry and help avoid everyone grabbing the same side."
+       Latency: 1606ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to minimize deadlock risk I’ll pick up one fork first and then attempt the other next turn."
+       Latency: 1345ms
+
+Timestep 17:
+
+  Table: P0=EATING(5,LR) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; grabbing it lets me eat now and then I’ll release both, avoiding deadlock and keeping throughput high."
+       Latency: 1177ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and the left fork is available; grabbing it lets me hold both forks and eat immediately, reducing contention and avoiding deadlock."
+       Latency: 1590ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both forks I need are currently taken, so attempting to grab either would fail. Waiting avoids holding one fork and contributing to deadlock, and preserves fairness until a fork is released."
+       Latency: 1850ms
+
+Timestep 18:
+
+  Table: P0=HUNGRY(5) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m currently eating and holding both forks; to avoid blocking neighbors and support fairness, I should finish and release both forks promptly."
+       Latency: 1595ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding one fork while my left fork is taken, so I can’t complete the pair to eat. To avoid contributing to deadlock and to improve overall throughput, I should release my fork so others can potentially eat and the system can progress."
+       Latency: 1817ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids contributing to contention and reduces deadlock risk while forks are unavailable."
+       Latency: 1537ms
+
+Timestep 19:
+
+  Table: P0=HUNGRY(5,L) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and I’m holding none; to avoid deadlock I’ll take one fork first and try to acquire the second next turn."
+       Latency: 2273ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll take the right fork first (a consistent ordering helps prevent circular wait)."
+       Latency: 1343ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to minimize deadlock risk, I’ll pick up one fork first and then try to acquire the other next turn."
+       Latency: 1274ms
+
+Timestep 20:
+
+  Table: P0=EATING(6,LR) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available, so I should take it now to eat and then release both, avoiding deadlock and keeping throughput high."
+       Latency: 1117ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available, so I should take it now to secure both forks and eat, minimizing wait and avoiding deadlock."
+       Latency: 1271ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. To avoid contributing to deadlock pressure and to keep things fair, I’ll wait for a fork to become available rather than spinning or making partial holds."
+       Latency: 1406ms
+
+Timestep 21:
+
+  Table: P0=HUNGRY(6) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m currently eating and holding both forks; to avoid blocking others and improve fairness, I should finish and release both forks now."
+       Latency: 1039ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding one fork while my left fork is taken, so I can’t acquire both to eat; to avoid contributing to a deadlock and let others progress, I should release my held fork."
+       Latency: 1601ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick up either. Waiting avoids contributing to deadlock and keeps the system stable until a fork is released."
+       Latency: 1289ms
+
+Timestep 22:
+
+  Table: P0=HUNGRY(6,L) P1=HUNGRY(1,L) P2=HUNGRY(0)
+  Forks: [P0] [P1] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and I’m holding none; I should take one fork now to progress toward eating, starting with the left by convention."
+       Latency: 1246ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up one fork first and then attempt the other next turn."
+       Latency: 1283ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up my right fork first (a consistent ordering helps prevent circular wait)."
+       Latency: 1360ms
+
+Timestep 23:
+
+  Table: P0=HUNGRY(6) P1=EATING(2,LR) P2=HUNGRY(0)
+  Forks: [free] [P1] [P1]
+
+  [P0] Action: RELEASE
+       Reasoning: "I already hold my left fork, but my right fork is taken. Holding one fork while waiting increases deadlock risk and reduces overall throughput, so I should release and retry later."
+       Latency: 1293ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat now and then I’ll release both, improving throughput without risking deadlock."
+       Latency: 1294ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is taken, so grabbing the left would risk contributing to deadlock (holding one fork while waiting). I’ll wait until the right fork becomes available, then try to take both in sequence."
+       Latency: 1607ms
+
+Timestep 24:
+
+  Table: P0=HUNGRY(6) P1=HUNGRY(2) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now risks contributing to deadlock by holding one fork while waiting. To keep forks available and maintain fairness/throughput, I should wait until both forks are available before attempting to eat."
+       Latency: 1955ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m already eating and holding both forks; to prevent blocking neighbors and keep things fair, I should finish and release both forks now."
+       Latency: 1620ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t acquire both forks. Grabbing the right fork now could contribute to deadlock if others do the same; better to wait until the left becomes available so I can take both promptly."
+       Latency: 1832ms
+
+Timestep 25:
+
+  Table: P0=HUNGRY(6,L) P1=HUNGRY(2,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both adjacent forks are available, so I can safely acquire one now and then the other next turn without blocking anyone who is already holding a fork. I’ll start by taking my left fork."
+       Latency: 1498ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, so I can safely start by taking one. To reduce deadlock risk, I’ll follow an asymmetric rule: as P1, I pick up my right fork first."
+       Latency: 1581ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to minimize deadlock risk, I’ll pick up one fork first and then aim to take the other next turn if still free."
+       Latency: 1590ms
+
+Timestep 26:
+
+  Table: P0=EATING(7,LR) P1=HUNGRY(2,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat now and then I’ll release both, avoiding deadlock and keeping throughput high."
+       Latency: 1767ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; grabbing it lets me hold both forks and eat immediately, improving throughput without increasing deadlock risk."
+       Latency: 1613ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids contributing to deadlock and lets forks become available."
+       Latency: 1173ms
+
+Timestep 27:
+
+  Table: P0=HUNGRY(7) P1=HUNGRY(2) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m currently eating and holding both forks; to prevent blocking neighbors and keep the system moving fairly, I should finish and release both forks now."
+       Latency: 1482ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding my right fork, but my left fork is currently taken, so I can’t start eating. To reduce the risk of deadlock and improve fairness/throughput, I should release my right fork so others can complete a pair and eat."
+       Latency: 1587ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick either up without blocking or causing contention. Waiting avoids deadlock pressure and lets forks become available."
+       Latency: 1823ms
+
+Timestep 28:
+
+  Table: P0=HUNGRY(7,L) P1=HUNGRY(2,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock I’ll take one fork first and only proceed to the second if it remains available next turn."
+       Latency: 1225ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to minimize deadlock risk, I’ll pick up one fork and then try to acquire the other next turn."
+       Latency: 1344ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork first and then try to acquire the other next turn."
+       Latency: 1284ms
+
+
+--------------------------------------------------------------------------------
+Episode 4 Result: DEADLOCK at timestep 28
+  Meals: [7, 2, 0]
+  Throughput: 0.321
+  Fairness: 0.222
+
+
+================================================================================
+Episode 5
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0,R) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock we should not create a “everyone grabs left” pattern. I’ll grab my right fork first to break symmetry and move toward eating."
+       Latency: 1426ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "To avoid deadlock, I’ll follow an asymmetric strategy: I (P1) pick up my right fork first. Both forks are free, so this is safe and keeps the system from everyone grabbing the same side first."
+       Latency: 1548ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I’ll take one to start eating, but to reduce deadlock risk I’ll grab my right fork first (a consistent asymmetric rule helps prevent cycles)."
+       Latency: 1278ms
+
+
+--------------------------------------------------------------------------------
+Episode 5 Result: DEADLOCK at timestep 1
+  Meals: [0, 0, 0]
+  Throughput: 0.000
+  Fairness: 1.000
+
+
+================================================================================
+Episode 6
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,L) P2=HUNGRY(0)
+  Forks: [P0] [P1] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, so I can safely take one now and then take the other next turn to eat, without risking immediate deadlock from my side. I’ll start by taking my left fork."
+       Latency: 1449ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up one fork first and aim to acquire the other next turn if still free."
+       Latency: 1339ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to minimize deadlock risk, I’ll pick up one fork first and then attempt the other next turn."
+       Latency: 1311ms
+
+Timestep 2:
+
+  Table: P0=HUNGRY(0) P1=EATING(1,LR) P2=HUNGRY(0)
+  Forks: [free] [P1] [P1]
+
+  [P0] Action: RELEASE
+       Reasoning: "I already hold my left fork but my right fork is taken, so I can’t eat. Holding one fork while waiting increases deadlock risk and blocks my neighbor; releasing improves overall progress and fairness."
+       Latency: 2243ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat immediately and then I’ll release both, avoiding deadlock and improving throughput."
+       Latency: 1612ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is already taken, so grabbing the left now would risk a deadlock pattern (holding one fork while waiting indefinitely). I’ll wait for the right fork to become available before attempting to pick up both in sequence."
+       Latency: 1863ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(0) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork would risk contributing to a deadlock or unnecessary blocking. I’ll wait until the right fork becomes available so I can attempt to take both in sequence."
+       Latency: 2074ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’ve finished eating and should release both forks immediately so others can proceed, preventing contention and improving fairness."
+       Latency: 1215ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is already taken, so I can’t eat yet. Grabbing the right fork now could contribute to deadlock if neighbors also hold one fork each. Better to wait until both forks are available before picking anything up."
+       Latency: 1644ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(1,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock patterns, I’ll start by taking one fork (left) and then attempt to take the right next turn if still free."
+       Latency: 1400ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock I’ll pick up one fork first and then attempt to take the other next turn if still free."
+       Latency: 1300ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up one fork first and only proceed to the second if it remains available next turn."
+       Latency: 1329ms
+
+
+--------------------------------------------------------------------------------
+Episode 6 Result: DEADLOCK at timestep 4
+  Meals: [0, 1, 0]
+  Throughput: 0.250
+  Fairness: 0.000
+
+
+================================================================================
+Episode 7
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0,R) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to eat I should secure one fork first while minimizing deadlock risk. I’ll pick up my right fork now and then attempt the left next turn."
+       Latency: 1762ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "To avoid deadlock, I’ll follow an asymmetric rule: as P1 I pick up my right fork first. Both forks are available, so I can start by taking the right fork."
+       Latency: 1453ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up my right fork first (a consistent ordering helps prevent circular wait)."
+       Latency: 1673ms
+
+
+--------------------------------------------------------------------------------
+Episode 7 Result: DEADLOCK at timestep 1
+  Meals: [0, 0, 0]
+  Throughput: 0.000
+  Fairness: 1.000
+
+
+================================================================================
+Episode 8
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0) P2=HUNGRY(0,L)
+  Forks: [free] [P0] [P2]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I’ll take one now to start eating, choosing the right fork to break symmetry and reduce deadlock risk if others follow a left-first rule."
+       Latency: 1831ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll take one fork now and aim to acquire the other next turn if still free."
+       Latency: 1739ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to make progress while reducing deadlock risk, I’ll pick up one fork and then attempt the other next turn."
+       Latency: 1605ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0) P2=HUNGRY(0,L)
+  Forks: [P0] [P0] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork, and my left fork is available; taking it lets me eat immediately and release both, improving throughput without risking deadlock."
+       Latency: 1335ms
+
+  [P1] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids unnecessary contention and reduces deadlock risk while others finish and release."
+       Latency: 1282ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available, so I should take it now to eat and avoid holding just one fork unnecessarily."
+       Latency: 1351ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished eating and should release both forks immediately so others can eat and we avoid unnecessary blocking."
+       Latency: 1113ms
+
+  [P1] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids unnecessary contention and reduces deadlock risk while I monitor for availability."
+       Latency: 1430ms
+
+  [P2] Action: RELEASE
+       Reasoning: "I’m holding my left fork but my right fork is taken, so trying to grab right would block and risks deadlock if others do the same. Releasing my left fork lets neighbors proceed and improves overall throughput and fairness."
+       Latency: 1459ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,R) P1=HUNGRY(0,R) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to eat I should acquire one now, and starting with the right fork helps avoid symmetric deadlock if others default to left-first."
+       Latency: 1644ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "To avoid deadlock, I’ll follow an asymmetric rule: as P1 I pick up my right fork first. Both forks are available, so I can start by taking the right."
+       Latency: 1728ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up my right fork first (a consistent ordering strategy) so I can then take the left and eat."
+       Latency: 1610ms
+
+
+--------------------------------------------------------------------------------
+Episode 8 Result: DEADLOCK at timestep 4
+  Meals: [1, 0, 0]
+  Throughput: 0.250
+  Fairness: 0.000
+
+
+================================================================================
+Episode 9
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0,R) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll start by taking my right fork (a consistent right-first policy helps prevent circular wait)."
+       Latency: 1305ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; taking one fork now could contribute to a deadlock pattern if everyone does the same. I’ll instead try to acquire both by taking the right fork first (a consistent ordering helps avoid circular wait)."
+       Latency: 2075ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll take one fork now and aim to only proceed to the second if it remains available next turn, otherwise I’ll release."
+       Latency: 1324ms
+
+
+--------------------------------------------------------------------------------
+Episode 9 Result: DEADLOCK at timestep 1
+  Meals: [0, 0, 0]
+  Throughput: 0.000
+  Fairness: 1.000
+
+
+================================================================================
+Episode 10
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [free] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll follow an asymmetric rule and pick up my right fork first."
+       Latency: 1031ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork (right) and then attempt the other next turn."
+       Latency: 1261ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to minimize deadlock risk, I’ll pick up one fork and then aim to take the other next turn if still free."
+       Latency: 1837ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [P0] [P0] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; taking it lets me eat immediately and release both, avoiding deadlock and increasing throughput."
+       Latency: 1376ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken, so I can’t complete a pair to eat. Holding one fork while waiting risks contributing to deadlock; releasing promotes progress and fairness."
+       Latency: 1359ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is unavailable, so I can’t complete a pair. Grabbing the right fork now would likely contribute to deadlock by holding one fork while waiting; better to wait until both are available."
+       Latency: 1839ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished eating and I’m holding both forks; releasing them promptly prevents others from blocking and improves throughput and fairness."
+       Latency: 1035ms
+
+  [P1] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t eat yet. Grabbing the right fork now risks contributing to deadlock if others do the same with their available fork. I’ll wait until both forks can be acquired promptly."
+       Latency: 1719ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now would risk contributing to a deadlock pattern and would also block my neighbor unnecessarily. I’ll wait until the right fork becomes available so I can attempt to acquire both in close succession."
+       Latency: 1600ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,R) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [free] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I’ll take one fork to progress toward eating, choosing the right fork to reduce symmetry and help avoid deadlock patterns."
+       Latency: 1329ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; taking one fork now is safe, and I’ll start by grabbing the right fork to avoid symmetric behavior that can lead to deadlock if others also grab left first."
+       Latency: 1229ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up one fork first and then try for the other next turn."
+       Latency: 1269ms
+
+Timestep 5:
+
+  Table: P0=EATING(2,LR) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [P0] [P0] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and the left fork is available; taking it lets me eat immediately and then release both, improving throughput and avoiding deadlock."
+       Latency: 1108ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken; if I keep holding the right fork I risk contributing to deadlock. Releasing frees resources and improves overall progress and fairness."
+       Latency: 1449ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is taken, so I can’t eat yet. Grabbing the right fork now could contribute to deadlock if others do the same; better to wait until the left becomes available so I can take both in sequence."
+       Latency: 1600ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished this eating turn and should release both forks so neighbors can proceed, preventing contention and improving fairness."
+       Latency: 1281ms
+
+  [P1] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t eat yet. Grabbing the right fork now risks contributing to deadlock if others do the same with their available fork. Best to wait until both forks can be acquired together."
+       Latency: 1791ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing the left fork would risk contributing to deadlock by holding one fork while waiting indefinitely for the other. I should wait until both forks are available before attempting to eat."
+       Latency: 1558ms
+
+Timestep 7:
+
+  Table: P0=HUNGRY(2,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and I’m holding none, so I should take one now; I’ll start by grabbing the left fork as the first step toward acquiring both without waiting."
+       Latency: 1244ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; taking one risks deadlock if everyone does the same, but I can proceed by taking a fork to start eating while staying ready to release if contention arises. I’ll take the right fork first as a simple asymmetric choice."
+       Latency: 1861ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, so I can safely start by picking one up; to reduce deadlock risk, I’ll pick up my right fork first (breaking symmetry with a common left-first pattern)."
+       Latency: 1486ms
+
+Timestep 8:
+
+  Table: P0=EATING(3,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I’m already holding my left fork and my right fork is available; taking it lets me eat now and then I’ll release both, improving throughput without risking deadlock."
+       Latency: 1096ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and the left fork is available; grabbing it lets me acquire both forks and eat immediately, reducing waiting and avoiding deadlock pressure on others."
+       Latency: 1305ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick either up. Trying to grab would fail; waiting avoids contributing to deadlock and keeps things fair until a fork is released."
+       Latency: 1509ms
+
+Timestep 9:
+
+  Table: P0=HUNGRY(3) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m already eating and have completed this eating phase; releasing both forks promptly prevents blocking neighbors and improves throughput and fairness."
+       Latency: 1623ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken, so I can’t eat. Holding one fork while waiting risks contributing to deadlock and reduces overall throughput. I should release to let neighbors complete and restore progress/fairness."
+       Latency: 1905ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either will fail. Waiting avoids unnecessary contention and reduces deadlock risk while I monitor for a fork becoming free."
+       Latency: 1229ms
+
+Timestep 10:
+
+  Table: P0=HUNGRY(3,L) P1=HUNGRY(0,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; I can safely take one now and then take the other next turn to eat, without risking deadlock from my side."
+       Latency: 1045ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork first and then try for the other next turn."
+       Latency: 1650ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up one fork and then aim to acquire the other next turn if it remains free."
+       Latency: 1238ms
+
+
+--------------------------------------------------------------------------------
+Episode 10 Result: DEADLOCK at timestep 10
+  Meals: [3, 0, 0]
+  Throughput: 0.300
+  Fairness: 0.000
+
+
+================================================================================
+Episode 11
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [free]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up one fork first and then try to acquire the other next turn. I’ll start with the right fork."
+       Latency: 2585ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock patterns, I’ll pick up one fork first and then try to acquire the other next turn."
+       Latency: 1148ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll start by taking one fork (right) and then try to take the other next turn."
+       Latency: 1097ms
+
+Timestep 2:
+
+  Table: P0=HUNGRY(0) P1=HUNGRY(0) P2=EATING(1,LR)
+  Forks: [P2] [free] [P2]
+
+  [P0] Action: RELEASE
+       Reasoning: "I already hold my right fork but my left fork is taken, so I can’t eat. Holding one fork risks deadlock and blocks neighbors, so I should release and retry later."
+       Latency: 1464ms
+
+  [P1] Action: WAIT
+       Reasoning: "Left fork is already taken, so I can’t eat yet. Grabbing the right fork now would risk contributing to deadlock if others do the same while waiting on their left. I’ll wait for the left fork to become available."
+       Latency: 1757ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available, so I should take it now to eat and avoid stalling."
+       Latency: 1032ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(0) P1=HUNGRY(0) P2=HUNGRY(1)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "Left fork is unavailable, so I can’t eat yet. Grabbing the right fork would risk contributing to deadlock if others do the same while waiting on their other fork. Best is to wait until both forks can be acquired promptly."
+       Latency: 1755ms
+
+  [P1] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now risks contributing to deadlock and blocks my neighbor. I’ll wait until the right fork becomes available, then try to take both in sequence."
+       Latency: 1540ms
+
+  [P2] Action: RELEASE
+       Reasoning: "I’m already eating and have completed a meal; to keep forks circulating and prevent others from waiting, I should release both forks now."
+       Latency: 1335ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0,R) P2=HUNGRY(1,R)
+  Forks: [P2] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to eat I should acquire one now. To reduce deadlock risk, I’ll follow an asymmetric strategy and pick up my right fork first."
+       Latency: 1781ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up my right fork first (a consistent asymmetric strategy helps)."
+       Latency: 1218ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, so I can safely start eating by picking one up; choosing the right fork keeps symmetry with a common “right-first” convention and avoids hesitation."
+       Latency: 1586ms
+
+
+--------------------------------------------------------------------------------
+Episode 11 Result: DEADLOCK at timestep 4
+  Meals: [0, 0, 1]
+  Throughput: 0.250
+  Fairness: 0.000
+
+
+================================================================================
+Episode 12
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [free]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to eat I should secure one fork first. I’ll start by taking my right fork to leave flexibility for neighbors and avoid symmetric deadlock patterns."
+       Latency: 1432ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up one fork first and then try to acquire the other next turn."
+       Latency: 1050ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll start by taking my right fork (a consistent ordering reduces circular wait) and then aim to take the left next turn if still available."
+       Latency: 2031ms
+
+Timestep 2:
+
+  Table: P0=HUNGRY(0) P1=HUNGRY(0) P2=EATING(1,LR)
+  Forks: [P2] [free] [P2]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is taken, so I can’t eat. To prevent a deadlock pattern where everyone holds one fork indefinitely, I should release and retry later."
+       Latency: 1293ms
+
+  [P1] Action: WAIT
+       Reasoning: "Left fork is currently taken, so I can’t start eating yet. Grabbing the right fork now risks contributing to deadlock if others also hold one fork and wait. Best to wait until both forks can be acquired promptly."
+       Latency: 1951ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; taking it lets me eat immediately, improving throughput without increasing deadlock risk this turn."
+       Latency: 1350ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(0) P1=HUNGRY(0) P2=HUNGRY(1)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "Left fork is unavailable, so I can’t eat yet. Grabbing the right fork now risks contributing to deadlock if others do the same; better to wait until both forks are available before picking up anything."
+       Latency: 1525ms
+
+  [P1] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now would risk a deadlock pattern if others do the same. I’ll wait for the right fork to become available before attempting to acquire both in a safe sequence."
+       Latency: 1716ms
+
+  [P2] Action: RELEASE
+       Reasoning: "I’ve finished this eating phase and should release both forks so neighbors can proceed, improving throughput and fairness."
+       Latency: 1202ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0,R) P2=HUNGRY(1)
+  Forks: [free] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, so I should take one now; to reduce deadlock risk, I’ll take my right fork first."
+       Latency: 1216ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll follow an ordered strategy and pick up my right fork first."
+       Latency: 1290ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; I can safely take one fork now and then take the other next turn to start eating without risking deadlock by holding just one while others do the same."
+       Latency: 1629ms
+
+Timestep 5:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0) P2=HUNGRY(1)
+  Forks: [P0] [P0] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold the right fork; the left fork is available, so I should take it now to eat and then release both, increasing throughput without risking deadlock."
+       Latency: 1818ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken, so I can’t eat. Holding one fork while waiting risks deadlock and reduces overall throughput; releasing lets the neighbor proceed and improves fairness."
+       Latency: 1493ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t eat yet. Grabbing the right fork now could contribute to deadlock if others do the same while waiting on their left. To avoid holding one fork and blocking neighbors, I’ll wait for the left fork to free up."
+       Latency: 1949ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(1)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m already eating and holding both forks; to avoid blocking others and keep things fair, I should finish and release both forks now."
+       Latency: 1180ms
+
+  [P1] Action: WAIT
+       Reasoning: "Left fork is unavailable, so I can’t eat yet. Grabbing the right fork now risks contributing to deadlock if others do the same while waiting on their left. Best to wait for the left fork to free up."
+       Latency: 1733ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left now risks contributing to deadlock and doesn’t let me eat. I’ll wait until the right fork becomes available so I can take both in sequence."
+       Latency: 1527ms
+
+Timestep 7:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,R) P2=HUNGRY(1)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, so I can safely take one now and then take the other next turn to eat without risking deadlock from already holding one. I’ll start by taking my left fork."
+       Latency: 1562ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; taking one risks deadlock if everyone does the same, so I’ll follow an asymmetric rule and grab my right fork first to reduce circular wait."
+       Latency: 1570ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, so I can safely acquire one now and then the other next to eat, without risking immediate deadlock from my side."
+       Latency: 1338ms
+
+Timestep 8:
+
+  Table: P0=EATING(2,LR) P1=HUNGRY(0,R) P2=HUNGRY(1)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I’m already holding my left fork and the right fork is available, so I should take it now to eat and avoid holding just one fork longer than necessary."
+       Latency: 1492ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; taking it lets me hold both forks and eat immediately, reducing contention and avoiding deadlock."
+       Latency: 1527ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids unnecessary contention and helps prevent deadlock patterns."
+       Latency: 1107ms
+
+Timestep 9:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(0) P2=HUNGRY(1)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m currently eating and already have both forks; to prevent blocking neighbors and keep the system moving, I should finish and release both forks now."
+       Latency: 1462ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken, so I can’t eat. Holding one fork while waiting increases deadlock risk and blocks others; I should release and retry later."
+       Latency: 1422ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. To avoid contributing to contention and deadlock risk, I should wait until at least one fork becomes available."
+       Latency: 1249ms
+
+Timestep 10:
+
+  Table: P0=HUNGRY(2,R) P1=HUNGRY(0,R) P2=HUNGRY(1,R)
+  Forks: [P2] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available and I’m holding none, so I should take one now to move toward eating. To reduce deadlock risk, I’ll follow a consistent order (right first)."
+       Latency: 1179ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; taking one (right) is safe now and sets up to take the other next. I’ll start with the right fork to follow a consistent order and reduce deadlock risk."
+       Latency: 2017ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I’ll take one now to start eating while keeping the system moving. I’ll grab my right fork first to reduce symmetry with neighbors who might grab left."
+       Latency: 1418ms
+
+
+--------------------------------------------------------------------------------
+Episode 12 Result: DEADLOCK at timestep 10
+  Meals: [2, 0, 1]
+  Throughput: 0.300
+  Fairness: 0.333
+
+
+================================================================================
+Episode 13
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [free]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to eat I should take one now and then take the other next turn, but to reduce deadlock risk I’ll follow a consistent global order (pick up right first)."
+       Latency: 1614ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up one fork now and only proceed to take the second if it remains available next turn (otherwise I’ll release and wait)."
+       Latency: 1492ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll follow an asymmetric rule (even-numbered philosopher picks up right fork first)."
+       Latency: 1409ms
+
+Timestep 2:
+
+  Table: P0=HUNGRY(0) P1=HUNGRY(0) P2=EATING(1,LR)
+  Forks: [P2] [free] [P2]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m holding one fork while my left fork is taken; keeping my right fork would block my neighbor and risks deadlock. I should release and retry later."
+       Latency: 1681ms
+
+  [P1] Action: WAIT
+       Reasoning: "Left fork is unavailable, so I can’t eat yet. Grabbing the right fork alone risks contributing to deadlock if others do the same; better to wait until I can acquire both forks promptly."
+       Latency: 1446ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork; the left fork is available, so I should take it now to eat and avoid holding just one fork longer than necessary."
+       Latency: 1263ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(0) P1=HUNGRY(0) P2=HUNGRY(1)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "My left fork is unavailable, so I can’t eat yet. Grabbing the right fork now risks contributing to deadlock if others do the same while waiting on their left. I’ll wait for the left fork to free up before taking anything."
+       Latency: 1816ms
+
+  [P1] Action: WAIT
+       Reasoning: "My right fork is taken, so grabbing my left would risk contributing to a deadlock pattern (holding one fork while waiting). I’ll wait for the right fork to become available before attempting to pick up both in sequence."
+       Latency: 2279ms
+
+  [P2] Action: RELEASE
+       Reasoning: "I’ve finished eating and should release both forks so neighbors can proceed, improving throughput and fairness."
+       Latency: 1050ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,L) P2=HUNGRY(1,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to start eating efficiently without risking deadlock, I’ll pick up one fork first and then attempt to acquire the other next turn."
+       Latency: 1196ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork first and then try to acquire the other next turn."
+       Latency: 1231ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, so I can safely take one now and try to acquire the other next turn without contributing to a deadlock pattern."
+       Latency: 1222ms
+
+
+--------------------------------------------------------------------------------
+Episode 13 Result: DEADLOCK at timestep 4
+  Meals: [0, 0, 1]
+  Throughput: 0.250
+  Fairness: 0.000
+
+
+================================================================================
+Episode 14
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0) P2=HUNGRY(0,L)
+  Forks: [free] [P0] [P2]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, so I should pick one up to start eating. To reduce deadlock risk, I’ll follow a consistent ordering (pick up right first, then left)."
+       Latency: 1064ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; taking one fork now is safe and moves toward eating. I’ll grab my left fork first as part of a consistent strategy to avoid hesitation."
+       Latency: 1258ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork first and then try for the other next turn."
+       Latency: 2244ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0) P2=HUNGRY(0,L)
+  Forks: [P0] [P0] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available, so I should take it now to eat and avoid holding a single fork unnecessarily long."
+       Latency: 1491ms
+
+  [P1] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail; best to wait to avoid unnecessary contention and potential deadlock patterns."
+       Latency: 1183ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat now and prevents stalling while keeping progress fair (I’ve eaten 0 so far)."
+       Latency: 2537ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished eating and should release both forks immediately to prevent blocking neighbors and improve overall throughput and fairness."
+       Latency: 1261ms
+
+  [P1] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick up either. Waiting avoids unnecessary contention and reduces deadlock risk while I monitor for availability."
+       Latency: 1179ms
+
+  [P2] Action: RELEASE
+       Reasoning: "My right fork is taken, so I can’t complete eating. To avoid contributing to deadlock and to keep forks circulating fairly, I should release the left fork so others can proceed."
+       Latency: 1487ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, so I can safely start acquiring them; to reduce deadlock risk, I’ll pick up one fork and then immediately try for the other next turn."
+       Latency: 1144ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; taking one risks circular deadlock if everyone does the same. A common deadlock-avoidance strategy is asymmetric pickup: I’ll pick up my right fork first (assuming others may pick left first), then try to take left next turn."
+       Latency: 2144ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up just one fork first and only proceed to the second if it remains available next turn. I’ll start with the right fork."
+       Latency: 1381ms
+
+Timestep 5:
+
+  Table: P0=EATING(2,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; grabbing it lets me eat now and then I’ll release both, improving throughput without risking deadlock."
+       Latency: 1232ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I’m already holding my right fork and my left fork is available; taking it lets me hold both forks and eat immediately, improving throughput without increasing deadlock risk this turn."
+       Latency: 1242ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids unnecessary contention and reduces deadlock risk while I monitor for a fork becoming available."
+       Latency: 2457ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished eating and should release both forks promptly to avoid blocking neighbors and improve fairness/throughput."
+       Latency: 1103ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is taken, so I can’t eat. Keeping one fork increases deadlock risk and blocks my neighbor; I should release and retry later."
+       Latency: 1345ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick up either. Waiting avoids grabbing-and-holding behavior that can contribute to deadlock and preserves fairness until a fork is released."
+       Latency: 1254ms
+
+Timestep 7:
+
+  Table: P0=HUNGRY(2,R) P1=HUNGRY(0) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [free]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll acquire one fork and then aim to take the other immediately next turn. I’ll start with the right fork."
+       Latency: 1155ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll grab one fork first and only proceed to grab the other if it remains available next turn."
+       Latency: 1573ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "To reduce deadlock risk, I’ll follow an ordered strategy: pick up the right fork first (neighbors can still take their right first too, but this avoids me holding left while waiting on right if others do the opposite). Both forks are available, so I’ll start by taking one."
+       Latency: 2061ms
+
+Timestep 8:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(0) P2=EATING(1,LR)
+  Forks: [P2] [free] [P2]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is currently taken, so I can’t eat. Continuing to hold one fork risks contributing to deadlock and unfairness; releasing frees resources so the neighbor can finish and forks can circulate."
+       Latency: 1953ms
+
+  [P1] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t acquire both forks. Grabbing the right fork now risks contributing to deadlock if others do the same. I’ll wait for the left fork to become available."
+       Latency: 1835ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork, and my left fork is available; grabbing it lets me eat immediately and avoids unnecessary waiting."
+       Latency: 974ms
+
+Timestep 9:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(0) P2=HUNGRY(1)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "Left fork is currently taken, so I can’t eat yet. Grabbing the right fork now risks contributing to deadlock if others also hold one fork while waiting. Best to wait until both forks can be acquired promptly."
+       Latency: 1605ms
+
+  [P1] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now risks contributing to deadlock (I’d be holding one fork while waiting). To keep the system moving and avoid blocking my neighbor, I should wait until the right fork becomes available, then try to take both in sequence."
+       Latency: 1905ms
+
+  [P2] Action: RELEASE
+       Reasoning: "I’m currently eating and holding both forks; to avoid blocking neighbors and keep things fair, I should finish and release both forks now."
+       Latency: 1187ms
+
+Timestep 10:
+
+  Table: P0=HUNGRY(2,L) P1=HUNGRY(0,L) P2=HUNGRY(1,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, so I can safely take one now and aim to take the other next; I’ll take the left fork to begin acquiring the pair without waiting."
+       Latency: 1409ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to minimize deadlock risk, I’ll pick up one fork and then try to acquire the other next turn."
+       Latency: 1190ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, so I can safely take one now and then take the other next turn without risking immediate deadlock. I’ll start by picking up my left fork."
+       Latency: 2423ms
+
+
+--------------------------------------------------------------------------------
+Episode 14 Result: DEADLOCK at timestep 10
+  Meals: [2, 0, 1]
+  Throughput: 0.300
+  Fairness: 0.333
+
+
+================================================================================
+Episode 15
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; I’ll pick up one fork to begin eating while leaving flexibility to avoid deadlock if neighbors also reach."
+       Latency: 2031ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; take one to start eating, but avoid deadlock by committing to a consistent order. I’ll pick up my right fork first."
+       Latency: 1080ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; taking one risks deadlock if others do the same, so I’ll try to take the right fork first as a consistent asymmetric strategy."
+       Latency: 1147ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat immediately and releases both afterward, reducing deadlock risk and increasing throughput."
+       Latency: 1394ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; taking it completes the pair so I can eat immediately and then release, reducing deadlock risk."
+       Latency: 2210ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids unnecessary contention and reduces deadlock risk while others finish and release forks."
+       Latency: 1288ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m currently eating and already have both forks; to avoid blocking others and keep the system moving, I should finish and release both forks now."
+       Latency: 1342ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork but my left fork is taken, so I can’t eat. Holding one fork risks deadlock and blocks my neighbor; releasing promotes progress and fairness."
+       Latency: 2309ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick either up. Waiting avoids creating partial holds or contention and helps prevent deadlock."
+       Latency: 1080ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,R) P1=HUNGRY(0) P2=HUNGRY(0,L)
+  Forks: [free] [P0] [P2]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available and I’m holding none; to eat I should start by picking up one fork. I’ll grab my right fork first to proceed while avoiding unnecessary waiting."
+       Latency: 1365ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock I’ll take one fork now and try to acquire the other next turn, releasing if I can’t get it quickly."
+       Latency: 1286ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up one fork now and only proceed to take the second if it remains available next turn."
+       Latency: 1197ms
+
+Timestep 5:
+
+  Table: P0=EATING(2,LR) P1=HUNGRY(0) P2=HUNGRY(0,L)
+  Forks: [P0] [P0] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold the right fork and the left fork is available, so I should grab the left fork now to obtain both forks and eat, avoiding deadlock by completing the pair promptly."
+       Latency: 1376ms
+
+  [P1] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Best to wait to avoid unnecessary contention and let the system progress without creating deadlock pressure."
+       Latency: 2732ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat immediately and then I’ll release both, improving throughput without risking deadlock."
+       Latency: 1682ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished eating and should release both forks immediately to prevent blocking neighbors and avoid deadlock while keeping throughput high."
+       Latency: 1142ms
+
+  [P1] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick either up. Waiting avoids unnecessary contention and helps prevent deadlock while others finish and release."
+       Latency: 1262ms
+
+  [P2] Action: RELEASE
+       Reasoning: "My right fork is taken, so I can’t complete a pair to eat. To avoid contributing to deadlock and improve fairness, I should release my left fork so neighbors can potentially eat and free the right fork sooner."
+       Latency: 1407ms
+
+Timestep 7:
+
+  Table: P0=HUNGRY(2,R) P1=HUNGRY(0,R) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, so I should take one now but avoid the classic deadlock pattern where everyone grabs their left. I’ll grab my right fork first to help break symmetry and still be able to take the left next if it remains free."
+       Latency: 1578ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I can safely start by taking one fork. To reduce deadlock risk, I’ll follow an ordered strategy: pick up my right fork first, then try for the left next turn."
+       Latency: 1209ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to minimize deadlock risk, I’ll pick up one fork first and aim to acquire the other next turn if still free."
+       Latency: 1314ms
+
+
+--------------------------------------------------------------------------------
+Episode 15 Result: DEADLOCK at timestep 7
+  Meals: [2, 0, 0]
+  Throughput: 0.286
+  Fairness: 0.000
+
+
+================================================================================
+Episode 16
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [free] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; taking one now is safe, but to reduce deadlock risk I’ll follow a consistent order (right then left) so we avoid circular wait."
+       Latency: 1672ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I should take one now, but to reduce deadlock risk I’ll follow an ordered strategy: always grab the right fork first, then the left."
+       Latency: 1218ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I'll pick up one fork first and then attempt the other next turn, releasing if I can’t complete the pair quickly."
+       Latency: 1289ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [P0] [P0] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available, so I should take it now to eat and avoid unnecessary waiting."
+       Latency: 1048ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken, so I can’t eat. Continuing to hold one fork increases deadlock risk; releasing lets others complete meals and improves overall progress and fairness."
+       Latency: 1383ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t eat this turn. Grabbing the right fork now could contribute to deadlock if neighbors also hold one fork each. I’ll wait until both forks are available."
+       Latency: 1591ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished eating and should release both forks immediately so others can proceed and we avoid blocking or unfairness."
+       Latency: 1113ms
+
+  [P1] Action: WAIT
+       Reasoning: "Left fork is currently taken, so I can’t eat yet. Grabbing the right fork now risks contributing to deadlock if others do the same; better to wait until both forks are available."
+       Latency: 1756ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left now risks contributing to a deadlock chain. I’ll wait until the right fork becomes available, then attempt to take both in sequence."
+       Latency: 1134ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,R) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [free] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I can safely take one now and then the other next turn to eat, without risking deadlock by holding only one indefinitely. I’ll take the right fork first to follow a consistent asymmetric rule."
+       Latency: 1583ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork first and then attempt the other next turn, releasing if I can’t complete the pair quickly. I’ll start with the right fork."
+       Latency: 1535ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk I’ll pick up one fork first and then attempt the other next turn."
+       Latency: 1056ms
+
+Timestep 5:
+
+  Table: P0=EATING(2,LR) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [P0] [P0] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; grabbing it lets me hold both forks and eat immediately, improving throughput without risking deadlock."
+       Latency: 2675ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken, so I can’t eat. To avoid contributing to a deadlock pattern and to improve overall throughput/fairness, I should release my fork so the neighbor who holds the left fork can potentially acquire their other fork and eat, then I can try again later."
+       Latency: 1949ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is already taken, so I can’t acquire both forks right now. Grabbing the right fork would risk contributing to deadlock by holding one fork while waiting indefinitely for the left. I’ll wait for the left fork to become available."
+       Latency: 1600ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m currently eating and holding both forks; to avoid blocking neighbors and improve fairness/throughput, I should finish and release both forks now."
+       Latency: 1255ms
+
+  [P1] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t eat yet. Grabbing the right fork now would risk contributing to deadlock if others also hold one fork while waiting. Best is to wait for the left fork to become available."
+       Latency: 1865ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left would risk contributing to a deadlock pattern (everyone holding one fork). To stay safe and fair, I’ll wait until both forks are available before attempting to eat."
+       Latency: 1647ms
+
+Timestep 7:
+
+  Table: P0=HUNGRY(2,L) P1=HUNGRY(0,L) P2=HUNGRY(0)
+  Forks: [P0] [P1] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; taking one now is safe progress toward eating. I’ll pick up the left fork first (a consistent order helps avoid deadlock if others do the same)."
+       Latency: 1840ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork first and then try to acquire the other next turn if still available."
+       Latency: 1214ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll follow an asymmetric rule (even-numbered philosopher picks up right fork first)."
+       Latency: 1133ms
+
+Timestep 8:
+
+  Table: P0=HUNGRY(2) P1=EATING(1,LR) P2=HUNGRY(0)
+  Forks: [free] [P1] [P1]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m holding my left fork but my right fork is taken, so I can’t eat yet. To avoid contributing to a deadlock and improve overall throughput/fairness, I should release the left fork so others can complete their pair and eat."
+       Latency: 1653ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat immediately and reduces time holding a single fork, lowering deadlock risk."
+       Latency: 1081ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now could contribute to a deadlock pattern (everyone holds one fork and waits). To avoid blocking and keep the system moving fairly, I’ll wait until both forks are available before attempting to eat."
+       Latency: 1564ms
+
+Timestep 9:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now would risk contributing to a deadlock pattern (holding one fork while waiting indefinitely). To keep the system moving and fair, I should wait until the right fork becomes available, then attempt to take both in sequence."
+       Latency: 1866ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’ve finished eating and should free both forks so neighbors can proceed, preventing contention and improving fairness."
+       Latency: 919ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is unavailable; grabbing the right fork alone risks contributing to deadlock if neighbors do the same. Best to wait until I can acquire both in sequence."
+       Latency: 1383ms
+
+Timestep 10:
+
+  Table: P0=HUNGRY(2,R) P1=HUNGRY(1) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [free]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, so I can safely take one now and then take the other next turn to eat without risking deadlock from my side. I’ll start by taking the right fork."
+       Latency: 1409ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to eat I should secure both quickly while avoiding deadlock. I’ll take one fork now and aim to take the other next turn if still free."
+       Latency: 1326ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to start eating I should pick one up. To reduce deadlock risk, I’ll grab my right fork first (a consistent ordering helps)."
+       Latency: 1147ms
+
+Timestep 11:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(1) P2=EATING(1,LR)
+  Forks: [P2] [free] [P2]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is currently taken, so I can’t eat. Holding one fork while waiting risks deadlock and reduces overall throughput; releasing lets the neighbor finish and restores availability sooner."
+       Latency: 1541ms
+
+  [P1] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t acquire both forks. Grabbing the right fork now would risk contributing to deadlock or unfairly blocking my neighbor while I wait. Best to wait until the left fork becomes available."
+       Latency: 1709ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "I already have my right fork; the left fork is available, so I should take it now to eat and avoid holding one fork unnecessarily long."
+       Latency: 1088ms
+
+Timestep 12:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(1) P2=HUNGRY(1)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "Left fork is currently taken, so I can’t acquire both forks. Grabbing the right fork now would risk contributing to deadlock if my neighbor is waiting on it, so I’ll wait for the left fork to free up."
+       Latency: 1695ms
+
+  [P1] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork would risk contributing to a deadlock if everyone holds one fork. To avoid deadlock and keep forks available, I should wait until the right fork becomes available before attempting to pick up both."
+       Latency: 1413ms
+
+  [P2] Action: RELEASE
+       Reasoning: "I’ve just finished eating and should release both forks promptly to prevent blocking neighbors and support fairness/throughput."
+       Latency: 1008ms
+
+Timestep 13:
+
+  Table: P0=HUNGRY(2,R) P1=HUNGRY(1,R) P2=HUNGRY(1,R)
+  Forks: [P2] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both adjacent forks are available and I’m holding none; I should take one fork now, but to reduce deadlock risk I’ll start by taking my right fork (assuming neighbors may follow a left-first habit)."
+       Latency: 1516ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; taking one fork immediately risks contributing to a deadlock pattern if everyone does the same. I’ll start by taking my right fork (a consistent global ordering can help avoid cycles) and then try to take the left next turn."
+       Latency: 2053ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, so I can safely start by taking one. To reduce deadlock risk, I’ll follow an asymmetric rule: take my right fork first."
+       Latency: 1529ms
+
+
+--------------------------------------------------------------------------------
+Episode 16 Result: DEADLOCK at timestep 13
+  Meals: [2, 1, 1]
+  Throughput: 0.308
+  Fairness: 0.750
+
+
+================================================================================
+Episode 17
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,L) P2=HUNGRY(0)
+  Forks: [P0] [P1] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to minimize deadlock risk, I’ll start by picking up one fork (left) and then try to acquire the right next turn."
+       Latency: 1801ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up one fork now and only proceed to take the second if it remains available next turn—otherwise I’ll release and wait."
+       Latency: 1563ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I’ll pick up one fork first to start eating, choosing the right fork to reduce the chance of a symmetric deadlock if others default to grabbing left."
+       Latency: 1382ms
+
+Timestep 2:
+
+  Table: P0=HUNGRY(0) P1=EATING(1,LR) P2=HUNGRY(0)
+  Forks: [free] [P1] [P1]
+
+  [P0] Action: RELEASE
+       Reasoning: "I already hold my left fork but my right fork is taken, so I can’t eat. To avoid contributing to a deadlock chain and to improve overall throughput/fairness, I should release my fork and retry later rather than hold one indefinitely."
+       Latency: 2073ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat immediately and release both, avoiding deadlock and improving throughput."
+       Latency: 1211ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing the left would risk contributing to a deadlock if others also hold one fork while waiting. I’ll wait until the right fork becomes available so I can attempt to take both in sequence."
+       Latency: 1488ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(0) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "My right fork is taken, so grabbing the left now risks holding one fork and contributing to deadlock. I’ll wait until both forks can be acquired together."
+       Latency: 1394ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’ve finished eating and should free both forks so neighbors can proceed, preventing contention and improving fairness."
+       Latency: 1096ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t eat yet. Grabbing the right fork now would risk contributing to a deadlock if others are also holding one fork and waiting. I’ll wait for the left fork to become available."
+       Latency: 1631ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(1,R) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, so I should pick one up to start eating; taking the right fork first helps avoid symmetric deadlock if others default to left-first."
+       Latency: 1329ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I can safely try to acquire one to start eating. To reduce deadlock risk, I’ll pick up my right fork first (assuming others may pick left first)."
+       Latency: 1446ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock patterns, I’ll take one fork now and try to acquire the other next turn."
+       Latency: 1322ms
+
+
+--------------------------------------------------------------------------------
+Episode 17 Result: DEADLOCK at timestep 4
+  Meals: [0, 1, 0]
+  Throughput: 0.250
+  Fairness: 0.000
+
+
+================================================================================
+Episode 18
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,L) P2=HUNGRY(0)
+  Forks: [P0] [P1] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; take one to start eating, but avoid deadlock by not holding a single fork indefinitely if the other becomes unavailable. I’ll grab my left fork first."
+       Latency: 1450ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are currently available; taking one fork is safe as a first step, and I’ll follow a consistent order (left then right) to coordinate predictably."
+       Latency: 1368ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both forks are available; taking one fork now could contribute to a deadlock if others do the same. I’ll wait for a clearer opportunity to take both in sequence."
+       Latency: 1165ms
+
+Timestep 2:
+
+  Table: P0=HUNGRY(0) P1=EATING(1,LR) P2=HUNGRY(0)
+  Forks: [free] [P1] [P1]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m holding my left fork but my right fork is taken, so I can’t eat. To avoid contributing to deadlock and to keep forks available for others, I should release the fork I’m holding and try again later."
+       Latency: 1414ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "I’m already holding my left fork and my right fork is available; taking it lets me eat immediately and reduces the time I’m holding a single fork, lowering deadlock risk."
+       Latency: 1370ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now risks contributing to deadlock if everyone holds one fork. I’ll wait until both forks can be acquired promptly."
+       Latency: 1401ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(0) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now risks contributing to deadlock if others do the same. I’ll wait until the right fork becomes available so I can acquire both in sequence without blocking the system."
+       Latency: 1664ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’ve finished eating and should release both forks promptly so neighbors can eat, improving throughput and fairness."
+       Latency: 1023ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is already taken, so I can’t complete a pair. Grabbing the right fork now could contribute to deadlock by holding one fork while waiting. I’ll wait for the left fork to become available."
+       Latency: 1484ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock I’ll take one fork first and aim to acquire the other next turn."
+       Latency: 1256ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; take one now to progress toward eating while minimizing deadlock risk by committing to a consistent order (right-first)."
+       Latency: 1143ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I’ll pick up one fork to start eating, choosing the right fork to reduce the chance of symmetric deadlock if others default to grabbing left first."
+       Latency: 1372ms
+
+Timestep 5:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available, so I should take it now to eat and avoid waiting while holding one fork."
+       Latency: 1114ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork; the left fork is available, so I should take it to get both forks and eat immediately, minimizing contention and avoiding deadlock."
+       Latency: 1323ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick either up. Waiting avoids creating contention and reduces deadlock risk."
+       Latency: 1420ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished eating and should release both forks immediately so others can eat and we avoid blocking progress."
+       Latency: 1036ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding one fork while my left fork is taken, so I can’t complete a pair. Keeping my right fork risks contributing to deadlock and blocks my neighbor; releasing it improves overall progress and fairness."
+       Latency: 3581ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick either up. Trying to grab would fail; best is to wait and avoid contributing to deadlock pressure."
+       Latency: 1063ms
+
+Timestep 7:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, so I can safely start by taking one fork now and aim to take the other next turn without risking immediate deadlock."
+       Latency: 1134ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both adjacent forks are available, so I can safely begin by taking one. To reduce deadlock risk, I’ll follow a consistent policy of picking up my right fork first."
+       Latency: 1478ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up my right fork first (a consistent ordering strategy helps prevent circular wait)."
+       Latency: 1330ms
+
+Timestep 8:
+
+  Table: P0=EATING(2,LR) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat now and then release both, improving throughput without risking deadlock."
+       Latency: 1393ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and the left fork is available; grabbing it lets me eat now and release both immediately, improving throughput without creating a deadlock."
+       Latency: 1371ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick either up. Waiting avoids creating contention and helps prevent deadlock while others finish and release."
+       Latency: 1305ms
+
+Timestep 9:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m already eating and holding both forks; to prevent blocking neighbors and promote fairness, I should finish and release both forks now."
+       Latency: 1688ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding one fork while my left fork is taken, so I can’t eat yet. To avoid contributing to deadlock and to improve overall throughput/fairness, I should release my held fork so others can complete a pair and eat."
+       Latency: 1998ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids interfering and reduces deadlock risk while others finish and release."
+       Latency: 1099ms
+
+Timestep 10:
+
+  Table: P0=HUNGRY(2,L) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, so I can safely take one now and then take the other next turn to eat without risking deadlock from already holding one fork."
+       Latency: 1344ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both adjacent forks are available; to minimize deadlock risk, I’ll pick up one fork first and aim to acquire the second immediately next turn if still free. I’ll start with the right fork."
+       Latency: 1462ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll grab the right fork first (a consistent right-first strategy prevents circular wait if everyone follows it)."
+       Latency: 1448ms
+
+Timestep 11:
+
+  Table: P0=EATING(3,LR) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat now and then I’ll release both, avoiding deadlock and improving throughput."
+       Latency: 1291ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; taking it lets me acquire both forks and eat immediately, minimizing contention and avoiding deadlock."
+       Latency: 1231ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick either up. Waiting avoids creating deadlock pressure and preserves fairness until a fork is released."
+       Latency: 1267ms
+
+Timestep 12:
+
+  Table: P0=HUNGRY(3) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m already eating and have completed a meal cycle; releasing both forks promptly prevents blocking neighbors and improves fairness and throughput."
+       Latency: 1171ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is taken, so I can’t eat. To avoid contributing to a deadlock pattern and to improve overall throughput/fairness, I should release the fork I’m holding so others can potentially complete a pair and eat."
+       Latency: 1859ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids contributing to contention and potential deadlock; I’ll try again when a fork is released."
+       Latency: 1299ms
+
+Timestep 13:
+
+  Table: P0=HUNGRY(3,L) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and I’m holding none; to eat I should pick one up now and then take the other next turn, avoiding delay."
+       Latency: 1425ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, so I should take one now to move toward eating. To reduce deadlock risk, I’ll follow a consistent asymmetric rule: as P1, I pick up my right fork first."
+       Latency: 1494ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll start by picking up my right fork (a consistent right-first strategy helps prevent circular wait)."
+       Latency: 1547ms
+
+Timestep 14:
+
+  Table: P0=EATING(4,LR) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available, so I should take it now to eat and keep throughput high without risking deadlock."
+       Latency: 1114ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold the right fork and the left fork is available; grabbing it lets me eat immediately and then release both, minimizing time holding a single fork and reducing deadlock risk."
+       Latency: 1390ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids unnecessary contention and helps prevent deadlock while others finish and release."
+       Latency: 1702ms
+
+Timestep 15:
+
+  Table: P0=HUNGRY(4) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished this eating turn and should free both forks immediately to prevent blocking neighbors and improve overall throughput and fairness."
+       Latency: 1266ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding one fork while my left fork is taken, so I can’t eat and I risk contributing to deadlock. Releasing frees my right fork for a neighbor and improves overall progress/fairness."
+       Latency: 1624ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick either up. Waiting avoids pointless contention and reduces deadlock risk while others finish and release."
+       Latency: 1351ms
+
+Timestep 16:
+
+  Table: P0=HUNGRY(4,R) P1=HUNGRY(1) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [free]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available and I’m holding none; taking one fork now advances toward eating. To reduce deadlock risk, I’ll pick up my right fork first (a consistent asymmetric rule helps)."
+       Latency: 4240ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up one fork first and then attempt the other next turn."
+       Latency: 1398ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll take the right fork first (assuming neighbors may prefer their own right/left consistently), then try to acquire the other next turn."
+       Latency: 2055ms
+
+Timestep 17:
+
+  Table: P0=HUNGRY(4) P1=HUNGRY(1) P2=EATING(1,LR)
+  Forks: [P2] [free] [P2]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is taken, so I can’t eat. Continuing to hold one fork risks contributing to deadlock and unfairness, so I should release to let others proceed and try again later."
+       Latency: 1338ms
+
+  [P1] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t acquire both forks. Grabbing the right fork now risks contributing to deadlock or unfairly blocking my neighbor, so I’ll wait until the left fork becomes available."
+       Latency: 1868ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "I already have my right fork; the left fork is available, so I should grab it now to eat and avoid holding just one fork longer than necessary."
+       Latency: 1212ms
+
+Timestep 18:
+
+  Table: P0=HUNGRY(4) P1=HUNGRY(1) P2=HUNGRY(1)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "Left fork is unavailable, so I can’t acquire both forks. Grabbing the right fork now risks contributing to deadlock if my neighbor is waiting on it, so I’ll wait until the left fork becomes available."
+       Latency: 1596ms
+
+  [P1] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now risks contributing to deadlock (I’d be holding one fork while waiting). I’ll wait until the right fork becomes available, then try to take both in sequence."
+       Latency: 1711ms
+
+  [P2] Action: RELEASE
+       Reasoning: "I’ve finished this eating phase and should release both forks promptly so neighbors can eat, improving throughput and fairness."
+       Latency: 2077ms
+
+Timestep 19:
+
+  Table: P0=HUNGRY(4,R) P1=HUNGRY(1) P2=HUNGRY(1,R)
+  Forks: [P2] [P0] [free]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available and I’m holding none, so I can safely start eating by taking one fork now; I’ll take the right fork first to reduce the chance of symmetric deadlock if others default to left-first."
+       Latency: 1919ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up one fork first and then try to acquire the other next turn."
+       Latency: 1266ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll take my right fork first (a consistent ordering helps prevent circular wait), then try to take the left next turn."
+       Latency: 1503ms
+
+Timestep 20:
+
+  Table: P0=HUNGRY(4) P1=HUNGRY(1) P2=EATING(2,LR)
+  Forks: [P2] [free] [P2]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is taken, so I can’t eat. To avoid contributing to a deadlock or blocking neighbors, I should release my right fork and try again later."
+       Latency: 2593ms
+
+  [P1] Action: WAIT
+       Reasoning: "Left fork is currently taken, so I can’t acquire both forks. Grabbing the right fork now would risk contributing to deadlock if others do the same. Best is to wait until the left fork becomes available so I can take both in sequence."
+       Latency: 1717ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available, so I should grab the left fork to get both and eat, increasing throughput without risking deadlock (I’m not waiting while holding one fork)."
+       Latency: 1526ms
+
+Timestep 21:
+
+  Table: P0=HUNGRY(4) P1=HUNGRY(1) P2=HUNGRY(2)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t acquire both forks. Grabbing the right fork now risks contributing to deadlock or unfair blocking while I wait for the left. I’ll wait until the left fork becomes available, then try to take both quickly."
+       Latency: 2766ms
+
+  [P1] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now risks contributing to deadlock and also prevents my neighbor from completing a pair. I’ll wait until both forks are available before attempting to pick them up."
+       Latency: 1595ms
+
+  [P2] Action: RELEASE
+       Reasoning: "I’ve finished this eating turn and should release both forks promptly to prevent blocking neighbors and keep the system fair and deadlock-free."
+       Latency: 1272ms
+
+Timestep 22:
+
+  Table: P0=HUNGRY(4,L) P1=HUNGRY(1,R) P2=HUNGRY(2)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both adjacent forks are available and I’m holding none, so I can safely acquire one now and then take the other next turn to eat without risking deadlock from holding both sides simultaneously with others. I’ll start by taking my left fork."
+       Latency: 1441ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up my right fork first (a consistent right-first policy prevents circular wait)."
+       Latency: 1319ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both adjacent forks are available, so I can safely start by taking one. To reduce deadlock risk, I’ll pick up my right fork first (assuming neighbors may try left-first), then try to take the left next turn."
+       Latency: 1830ms
+
+Timestep 23:
+
+  Table: P0=EATING(5,LR) P1=HUNGRY(1,R) P2=HUNGRY(2)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available, so I should take it now to eat and quickly release both, improving throughput without risking deadlock."
+       Latency: 1574ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold the right fork and the left fork is available, so I should take it now to eat and avoid holding a single fork longer than necessary."
+       Latency: 1674ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t grab either without risking contention; waiting avoids deadlock and lets neighbors finish and release."
+       Latency: 1578ms
+
+Timestep 24:
+
+  Table: P0=HUNGRY(5) P1=HUNGRY(1) P2=HUNGRY(2)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m currently eating and already holding both forks; to prevent others from waiting and to keep the system fair and deadlock-free, I should finish and release both forks."
+       Latency: 1424ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding one fork but the other (left) is taken, so I can’t eat now. To avoid contributing to a deadlock and to improve overall throughput/fairness, I should release my fork and try again later."
+       Latency: 1563ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. To avoid unnecessary contention and potential deadlock patterns, I should wait until at least one fork becomes available."
+       Latency: 1320ms
+
+Timestep 25:
+
+  Table: P0=HUNGRY(5,R) P1=HUNGRY(1) P2=HUNGRY(2,L)
+  Forks: [free] [P0] [P2]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, so I can take one now and then take the other next turn to eat. To reduce deadlock risk, I’ll start by taking my right fork (assuming neighbors may prefer their left), keeping the system asymmetric."
+       Latency: 1575ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll take one fork and aim to acquire the other immediately next turn if still free."
+       Latency: 1201ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, so I can safely start eating without risking deadlock; I’ll pick up one fork first and then the other next turn."
+       Latency: 1201ms
+
+Timestep 26:
+
+  Table: P0=EATING(6,LR) P1=HUNGRY(1) P2=HUNGRY(2,L)
+  Forks: [P0] [P0] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; grabbing it lets me eat immediately and then release both, avoiding deadlock and keeping progress high."
+       Latency: 1390ms
+
+  [P1] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t pick either up. Waiting avoids creating contention and prevents deadlock risk."
+       Latency: 1245ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "I’m already holding my left fork and my right fork is available; I should take it now to eat and then release both, increasing throughput without risking deadlock."
+       Latency: 1715ms
+
+Timestep 27:
+
+  Table: P0=HUNGRY(6) P1=HUNGRY(1) P2=HUNGRY(2)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m currently eating and holding both forks; to avoid blocking neighbors and improve fairness/throughput, I should finish and release both forks now."
+       Latency: 1358ms
+
+  [P1] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids unnecessary contention and reduces deadlock risk while forks are unavailable."
+       Latency: 1271ms
+
+  [P2] Action: RELEASE
+       Reasoning: "I already hold my left fork but my right fork is taken, so I can’t eat. Holding one fork while waiting risks deadlock and is unfair to neighbors; I should release and retry later."
+       Latency: 1700ms
+
+Timestep 28:
+
+  Table: P0=HUNGRY(6) P1=HUNGRY(1,R) P2=HUNGRY(2,R)
+  Forks: [P2] [free] [P1]
+
+  [P0] Action: WAIT
+       Reasoning: "Both forks are available; taking one now risks contributing to deadlock if others do the same. Since I’ve already eaten 6, I’ll yield this turn to improve fairness and let others take forks first."
+       Latency: 1962ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to eat I should acquire one fork now, but to reduce deadlock risk I’ll follow a consistent order and pick up my right fork first."
+       Latency: 1419ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available and I’m holding none; I should take one fork first, and to reduce deadlock risk I’ll follow an ordered strategy (pick right first)."
+       Latency: 1446ms
+
+Timestep 29:
+
+  Table: P0=HUNGRY(6) P1=EATING(2,LR) P2=HUNGRY(2)
+  Forks: [free] [P1] [P1]
+
+  [P0] Action: WAIT
+       Reasoning: "Left fork is currently taken, so I can’t acquire both forks. Grabbing the right fork now risks contributing to deadlock if my neighbor grabs their other fork and we both wait. I’ll wait for the left fork to become available."
+       Latency: 2021ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already have my right fork; the left fork is available. Taking it lets me acquire both forks and eat immediately, reducing wait time and avoiding deadlock risk from holding only one fork."
+       Latency: 1420ms
+
+  [P2] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is taken, so I can’t eat. To avoid contributing to deadlock and to let neighbors make progress, I should release the fork I’m holding and try again later."
+       Latency: 1261ms
+
+Timestep 30:
+
+  Table: P0=HUNGRY(6) P1=HUNGRY(2) P2=HUNGRY(2)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now would risk contributing to a deadlock pattern (holding one fork while waiting). To keep the system moving and stay fair, I should wait until both forks are available before attempting to eat."
+       Latency: 1915ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m already eating and holding both forks; to prevent others from starving and to improve throughput, I should finish and release both forks so neighbors can eat."
+       Latency: 1346ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t acquire both forks. Grabbing the right fork now risks contributing to deadlock or blocking a neighbor; better to wait until the left becomes available and then try to take both in sequence."
+       Latency: 2253ms
+
+
+--------------------------------------------------------------------------------
+Episode 18 Result: COMPLETED at timestep 30
+  Meals: [6, 2, 2]
+  Throughput: 0.333
+  Fairness: 0.600
+
+
+================================================================================
+Episode 19
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [free] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I should take one now, but to reduce deadlock risk I’ll follow an asymmetric rule (P0 picks up right first)."
+       Latency: 1379ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll pick up my right fork first (a consistent ordering strategy helps prevent circular wait)."
+       Latency: 1253ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; I’ll pick up one fork first to begin eating, and we can avoid deadlock by not holding a single fork indefinitely if the second isn’t acquired promptly."
+       Latency: 1385ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [P0] [P0] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork, and my left fork is available; grabbing it lets me eat immediately and avoids waiting that could contribute to deadlock."
+       Latency: 3296ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding one fork but my left fork is taken, so I can’t eat. Holding my right fork risks contributing to deadlock and blocks my neighbor; releasing it improves progress and fairness."
+       Latency: 1493ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t eat yet. Grabbing the right fork now could contribute to deadlock or unfair blocking, so I’ll wait until both are available."
+       Latency: 1334ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished this eating phase; to prevent blocking neighbors and keep throughput/fairness high, I should release both forks immediately."
+       Latency: 1084ms
+
+  [P1] Action: WAIT
+       Reasoning: "My left fork is currently taken, so I can’t eat yet. Grabbing the right fork now risks contributing to deadlock if others do the same while waiting on their left. I’ll wait for the left fork to become available."
+       Latency: 1675ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left now risks contributing to a deadlock chain. To keep the system moving and stay fair, I’ll wait until both forks are available before attempting to eat."
+       Latency: 1636ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, so I should take one now to move toward eating; I’ll start by taking my left fork."
+       Latency: 1959ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; I can safely start by taking one. To reduce deadlock risk, I’ll pick up my right fork first (a consistent ordering helps)."
+       Latency: 1236ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork first and then try for the other next turn."
+       Latency: 1119ms
+
+Timestep 5:
+
+  Table: P0=EATING(2,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available, so I should take it now to eat and keep progress high without risking deadlock."
+       Latency: 1214ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork; the left fork is available, so I should take it now to get both forks and eat, then they’ll be released automatically—good for throughput and avoids deadlock since I’m completing a pair rather than holding one and waiting."
+       Latency: 2160ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so attempting to grab either would fail. Waiting avoids unnecessary contention and reduces deadlock risk while neighbors finish and release."
+       Latency: 1127ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m already eating and holding both forks; to prevent blocking neighbors and enable progress, I should finish and free both forks now."
+       Latency: 1081ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken, so I can’t eat. Holding one fork while waiting increases deadlock risk and blocks neighbors; releasing is safer and improves overall throughput and fairness."
+       Latency: 2087ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t safely acquire either; attempting to grab would fail and could contribute to contention. Best is to wait until at least one fork is released, avoiding deadlock pressure."
+       Latency: 1561ms
+
+Timestep 7:
+
+  Table: P0=HUNGRY(2,R) P1=HUNGRY(0) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [free]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available and I’m holding none, so I can safely acquire one fork now; to reduce deadlock risk, I’ll start by taking my right fork and then try for the left next turn."
+       Latency: 1429ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock I’ll take one fork first and only proceed to take the second if it remains available next turn."
+       Latency: 1261ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to avoid deadlock I’ll take one fork and then aim to take the other next turn. I’ll start with the right fork (consistent ordering helps prevent circular wait if others do similarly)."
+       Latency: 1556ms
+
+Timestep 8:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(0) P2=EATING(1,LR)
+  Forks: [P2] [free] [P2]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is currently taken, so I can’t eat. Holding one fork while waiting increases deadlock risk and reduces throughput; I should release to let neighbors proceed and try again later for fairness and progress."
+       Latency: 1530ms
+
+  [P1] Action: WAIT
+       Reasoning: "Left fork is currently taken, so I can’t eat yet. Grabbing the right fork now could contribute to deadlock if others do the same while waiting on their left. I’ll wait for the left fork to become available."
+       Latency: 1788ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork; the left fork is available, so I should take it now to eat and avoid waiting while holding one fork."
+       Latency: 1183ms
+
+Timestep 9:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(0) P2=HUNGRY(1)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "Left fork is taken so I can’t complete a pair; grabbing the right fork now risks deadlock by holding one fork while waiting. Better to wait until both are available."
+       Latency: 1230ms
+
+  [P1] Action: WAIT
+       Reasoning: "My right fork is currently taken, so grabbing my left fork now could contribute to a deadlock if others do the same. I’ll wait until both forks have a chance to be available before attempting to pick any up."
+       Latency: 1318ms
+
+  [P2] Action: RELEASE
+       Reasoning: "I’m already eating and holding both forks; to prevent blocking neighbors and keep the system moving fairly, I should finish and release both forks now."
+       Latency: 1213ms
+
+Timestep 10:
+
+  Table: P0=HUNGRY(2,R) P1=HUNGRY(0,R) P2=HUNGRY(1,R)
+  Forks: [P2] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; taking one now risks deadlock if neighbors do the same. I’ll grab my right fork first to follow an asymmetric strategy (reduces circular wait) and then aim to take the left next turn if still available."
+       Latency: 2479ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "To reduce deadlock risk, I’ll follow a consistent asymmetric policy: as P1 I pick up my right fork first. Both forks are available, so I can start acquiring resources safely."
+       Latency: 1452ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available and I’m holding none, so I can safely start by taking one fork; to reduce deadlock risk, I’ll pick up my right fork first."
+       Latency: 1657ms
+
+
+--------------------------------------------------------------------------------
+Episode 19 Result: DEADLOCK at timestep 10
+  Meals: [2, 0, 1]
+  Throughput: 0.300
+  Fairness: 0.333
+

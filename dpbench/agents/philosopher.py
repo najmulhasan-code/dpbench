@@ -4,7 +4,7 @@ import re
 import time
 from typing import Callable
 
-from dpbench.core.types import Action, Observation, AgentDecision, BenchmarkConfig, LLMCallRecord
+from dpbench.core.types import Action, Observation, AgentDecision, BenchmarkConfig, LLMCallRecord, ModelResponse
 
 
 def parse_action(response: str) -> Action:
@@ -71,11 +71,15 @@ def _build_system_prompt(template: str, name: str, n: int) -> str:
 
 
 def get_philosopher_decision(
-    model_fn: Callable[[str, str], str],
+    model_fn: Callable[[str, str], str | ModelResponse],
     observation: Observation,
     config: BenchmarkConfig,
 ) -> tuple[AgentDecision, LLMCallRecord]:
     """Get decision from one philosopher agent.
+
+    Model functions can return either:
+    - A plain string (backwards compatible)
+    - A ModelResponse with text and token counts
 
     Returns:
         Tuple of (AgentDecision, LLMCallRecord) for logging.
@@ -84,22 +88,34 @@ def get_philosopher_decision(
     user = _build_observation_prompt(observation, config.decision_prompt, config.communication)
 
     start_time = time.perf_counter()
-    response = model_fn(system, user)
+    result = model_fn(system, user)
     latency_ms = (time.perf_counter() - start_time) * 1000
+
+    # Handle both string and ModelResponse returns
+    if isinstance(result, ModelResponse):
+        response_text = result.text
+        tokens_in = result.tokens_in
+        tokens_out = result.tokens_out
+    else:
+        response_text = result
+        tokens_in = None
+        tokens_out = None
 
     decision = AgentDecision(
         philosopher_id=observation.philosopher_id,
-        action=parse_action(response),
-        message_to_neighbors=parse_message(response) if config.communication else None,
-        reasoning=parse_reasoning(response),
+        action=parse_action(response_text),
+        message_to_neighbors=parse_message(response_text) if config.communication else None,
+        reasoning=parse_reasoning(response_text),
     )
 
     llm_record = LLMCallRecord(
         philosopher_id=observation.philosopher_id,
         system_prompt=system,
         user_prompt=user,
-        response=response,
+        response=response_text,
         latency_ms=latency_ms,
+        tokens_in=tokens_in,
+        tokens_out=tokens_out,
     )
 
     return decision, llm_record

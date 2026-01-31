@@ -1,0 +1,48 @@
+conditions:
+  sim5nc:
+    mode: simultaneous
+    communication: false
+    philosophers: 5
+    description: "Simultaneous, 5 philosophers, no communication"
+
+  sim5c:
+    mode: simultaneous
+    communication: true
+    philosophers: 5
+    description: "Simultaneous, 5 philosophers, with communication"
+
+  seq5nc:
+    mode: sequential
+    communication: false
+    philosophers: 5
+    description: "Sequential, 5 philosophers, no communication"
+
+  seq5c:
+    mode: sequential
+    communication: true
+    philosophers: 5
+    description: "Sequential, 5 philosophers, with communication"
+
+  sim3nc:
+    mode: simultaneous
+    communication: false
+    philosophers: 3
+    description: "Simultaneous, 3 philosophers, no communication"
+
+  sim3c:
+    mode: simultaneous
+    communication: true
+    philosophers: 3
+    description: "Simultaneous, 3 philosophers, with communication"
+
+  seq3nc:
+    mode: sequential
+    communication: false
+    philosophers: 3
+    description: "Sequential, 3 philosophers, no communication"
+
+  seq3c:
+    mode: sequential
+    communication: true
+    philosophers: 3
+    description: "Sequential, 3 philosophers, with communication"

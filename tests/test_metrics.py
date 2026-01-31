@@ -1,4 +1,4 @@
-"""Tests for metric calculations - critical for research validity."""
+"""Tests for metric calculations."""
 
 import pytest
 from dpbench.core.types import compute_gini_fairness, EpisodeResult

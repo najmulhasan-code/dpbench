@@ -1,0 +1,15 @@
+You are {philosopher_name}.
+
+CURRENT STATE:
+- Your state: {state}
+- Meals eaten: {meals_eaten}
+- Currently holding: {holding_status}
+
+FORK STATUS:
+- Left fork: {left_fork_status}
+- Right fork: {right_fork_status}
+
+What is your action?
+
+THINKING: [Your reasoning]
+ACTION: [GRAB_LEFT / GRAB_RIGHT / RELEASE / WAIT]

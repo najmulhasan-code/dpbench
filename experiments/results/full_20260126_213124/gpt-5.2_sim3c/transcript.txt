@@ -1,0 +1,2506 @@
+================================================================================
+DPBench Experiment Transcript
+Started: 2026-01-26T22:58:01.408375
+Config: simultaneous, 3 philosophers, communication=enabled
+================================================================================
+
+
+================================================================================
+Episode 0
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [free] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll start by taking my right fork and signal neighbors to avoid grabbing the same fork simultaneously."
+       Message: "To both neighbors: I’m grabbing my RIGHT fork first this turn; please avoid grabbing the fork between us simultaneously."
+       Latency: 1779ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; take one fork now and signal neighbors to avoid both grabbing the same side, reducing deadlock risk. I’ll take my right fork and ask neighbors to alternate."
+       Message: "To neighbors: I’m grabbing my RIGHT fork first; please avoid grabbing your LEFT this turn—let’s alternate to prevent deadlock."
+       Latency: 2620ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork while signaling intent to take the other next turn."
+       Message: "To neighbors: I’m grabbing my LEFT fork now; I’ll try for RIGHT next—please avoid taking my right fork this turn if possible."
+       Latency: 2044ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [P0] [P0] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is free; taking it lets me eat immediately and avoids deadlock. I’ll inform neighbors I’m completing my pair now and will release after eating."
+       Message: "To both neighbors: I’m taking my LEFT now to eat (I already have RIGHT). I’ll release both immediately after."
+       Latency: 2317ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken, so I can’t eat yet. To avoid deadlock and reduce contention (since my right neighbor is trying to get their right fork, which is my right fork), I should release my right fork and wait for the left fork to free up later."
+       Message: "To neighbors: I’m releasing my RIGHT fork now to avoid blocking; I’ll wait and then try to take LEFT when it’s free, then RIGHT."
+       Latency: 2729ms
+
+  [P2] Action: WAIT
+       Reasoning: "Left fork is taken, so I can’t complete a pair. Grabbing my right fork now could contribute to a deadlock pattern if others also hold one fork. I’ll wait and let the fork situation resolve, honoring both neighbors’ coordination messages."
+       Message: "To both: Acknowledged—I'm waiting this turn (not grabbing the fork between us)."
+       Latency: 1788ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [free] [free] [P1]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve just eaten and should release both forks to keep the system moving and avoid blocking neighbors, especially since both neighbors are waiting/releasing."
+       Message: "To both: I’m releasing both forks now; I’ll wait one turn before attempting to eat again to keep things fair."
+       Latency: 2230ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Left fork is currently taken and left neighbor says they’re completing an eat cycle and will release soon. Right neighbor is waiting, and my right fork is available, so I can safely take my right fork now and then wait for the left fork to free up, avoiding deadlock since others aren’t competing for my right fork this turn."
+       Message: "To both: I’m grabbing my RIGHT fork now and will wait for LEFT to be released; I won’t try to take LEFT until it’s free."
+       Latency: 3587ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "My right fork is currently taken by my right neighbor who says they’ll finish eating and release both soon. I can safely grab my left fork now without risking deadlock, then wait to grab right when it becomes available."
+       Message: "To both: I’m grabbing my LEFT now and will wait for RIGHT to be released; I won’t hold LEFT indefinitely—if RIGHT doesn’t free up next turn I’ll release and retry."
+       Latency: 2521ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=EATING(1,LR) P2=HUNGRY(0)
+  Forks: [P0] [P1] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available for me right now; neighbors are likely to each hold one fork, so if I wait I risk a deadlock cycle. Best is to take one fork (left) and then try to complete the pair next turn; if blocked, I’ll release to preserve fairness."
+       Message: "To both: I’m taking my LEFT this turn; if I can’t get RIGHT next turn, I’ll RELEASE and retry (avoiding deadlock)."
+       Latency: 2766ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available, so I can safely grab left and eat now. Right neighbor plans to grab their left (my right), but I’m already holding it; I’ll signal that I’m completing a meal and will release immediately after to avoid them waiting too long."
+       Message: "To both: I’m taking my LEFT now to eat (I already have RIGHT). I’ll release both immediately after this meal so you can proceed."
+       Latency: 2220ms
+
+  [P2] Action: WAIT
+       Reasoning: "Left fork is currently taken, so I can’t eat this turn. Grabbing my right fork now could contribute to a deadlock if others also hold one fork; better to wait until the left fork is free, then attempt to take both in sequence."
+       Message: "To both: I’ll WAIT this turn (not taking my right fork) to avoid one-fork deadlock; when my left fork becomes free I’ll try to eat."
+       Latency: 2333ms
+
+Timestep 5:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "My right fork is currently taken by my right neighbor who is about to eat and then release. If I keep holding my left fork while waiting, I risk blocking my left neighbor unnecessarily. Best is to release now and let forks circulate; then I can grab right when it becomes available."
+       Message: "To both: I’m RELEASEing my left fork this turn to keep things moving; once right is free I’ll try to take RIGHT then LEFT to eat."
+       Latency: 2865ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’ve just eaten and should release both forks promptly so neighbors can proceed; this supports fairness and avoids blocking."
+       Message: "Released both forks now—go ahead. Let’s keep the “if you can’t get the second fork next turn, release” rule to avoid deadlock."
+       Latency: 1917ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both forks adjacent to me are currently taken. Left neighbor says they’re about to eat and will release both right after; right neighbor is attempting to acquire and will release if stuck. Best is to wait to avoid contention and then try to grab once a fork frees up."
+       Message: "To both: Acknowledged—both forks are taken on my side. I’ll WAIT this turn and then try to grab once one is released; please signal when you’ve released."
+       Latency: 2789ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(1,R) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [free] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available and right neighbor just released; safest is to pick one fork and aim to take the other next turn. I’ll follow the “can’t get second fork next turn, release” rule."
+       Message: "To both: I’m grabbing my right fork now; I’ll try for the left next turn—if I can’t get it, I’ll release to avoid deadlock."
+       Latency: 2243ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available to me, so I can eat by taking one now and the other next turn. To avoid deadlock, I’ll follow the “right-then-left” ordering and signal neighbors I’m taking my right fork."
+       Message: "To both: I’m grabbing my RIGHT fork now (then LEFT next) to eat; I’ll release both immediately after."
+       Latency: 2188ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to minimize contention with my right neighbor (who plans RIGHT then LEFT), I’ll take my LEFT first. I’ll follow the rule: if I can’t secure the second fork next turn, I’ll release to avoid deadlock."
+       Message: "Taking LEFT now; I’ll try for RIGHT next. If I can’t get it next turn, I’ll RELEASE per our rule."
+       Latency: 1983ms
+
+Timestep 7:
+
+  Table: P0=EATING(2,LR) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [P0] [P0] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork; my left fork is available. If I grab left now, I can eat immediately and then release both, which reduces contention and avoids deadlock given neighbors’ stated plans."
+       Message: "To both: I’m grabbing my LEFT to eat now; will release both immediately after."
+       Latency: 2274ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork but my left fork is taken, so I can’t eat. To avoid a deadlock cycle (each of us holding one fork), I should release now so neighbors can complete a pair and eat, then I’ll retry later."
+       Message: "To both: I’m RELEASEing my right fork now to break any potential deadlock—go ahead and complete your pair if you can; I’ll retry after."
+       Latency: 2210ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is already taken, so I can’t complete a pair. Grabbing the right fork now would risk a deadlock chain and block my right neighbor. Better to wait and keep the right fork free until the left becomes available."
+       Message: "To both: I’m WAITing (not taking my right fork) until my left fork is free—go ahead and eat/release; I’ll take both only when I can complete the pair."
+       Latency: 3109ms
+
+Timestep 8:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve just finished eating and should release both forks promptly to keep throughput high and let neighbors proceed; both neighbors are already avoiding deadlock, so releasing supports fairness."
+       Message: "Releasing both forks now—left neighbor can take their right when ready; right neighbor can retry for a full pair."
+       Latency: 1972ms
+
+  [P1] Action: WAIT
+       Reasoning: "Left fork is taken so I can’t complete a pair; grabbing my right now would risk holding one fork and contributing to deadlock. Right neighbor is waiting fairly, so I’ll wait until my left is free, then try to take both quickly."
+       Message: "To both: I’ll WAIT and won’t grab my right fork until my left is free; once it’s free I’ll try to take both and then release immediately after eating."
+       Latency: 2735ms
+
+  [P2] Action: WAIT
+       Reasoning: "Right fork is currently taken by my right neighbor who plans to eat and then release. My left fork is available, but if I grab it now I’d risk holding one fork and contributing to a deadlock/inefficiency. Best is to wait for the right fork to be released, then try to take both promptly."
+       Message: "To both: I’ll WAIT this turn to avoid holding one fork; once my right fork is released I’ll try to take both quickly—please ping when you’ve released."
+       Latency: 2952ms
+
+Timestep 9:
+
+  Table: P0=HUNGRY(2,L) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and both neighbors are waiting, so I can safely take one fork now and then the other next turn to eat without risking deadlock. I’ll signal neighbors to keep waiting while I complete the grab-eat-release cycle, then they can proceed."
+       Message: "To both: Both my forks are free; I’m going to take them and eat now—please keep WAIT this turn. I’ll release immediately after and ping you."
+       Latency: 2361ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are free and right neighbor is waiting, so I can safely take a full pair without risking deadlock. I’ll take one fork now and then take the other next turn; I’ll notify neighbors to keep waiting/retry after I finish."
+       Message: "Taking my right fork now; please keep waiting/avoid grabbing single forks—I'll release both right after I eat."
+       Latency: 2045ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are yielding/releasing, so I can safely take a fork now and then try to complete the pair next turn. To avoid deadlock, I’ll follow a left-first convention and signal I’m going for both quickly."
+       Message: "To both: I’m going to eat next—taking my left fork now, then right; I’ll release immediately after. Please avoid grabbing the forks adjacent to me until I’m done."
+       Latency: 2783ms
+
+Timestep 10:
+
+  Table: P0=EATING(3,LR) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [P0] [P0] [free]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I’m already holding my left fork; my right fork is free. To avoid deadlock and minimize interference with neighbors’ announced eats, I should complete my own eat quickly by taking the right fork, then I’ll be forced to release both."
+       Message: "To both: I’m completing an eat now (already have left); taking right and will release both immediately after."
+       Latency: 2514ms
+
+  [P1] Action: RELEASE
+       Reasoning: "Both neighbors are requesting I don’t contend for adjacent forks while they eat. I’m already holding my right fork, which could block my right neighbor’s left. To avoid deadlock and be fair, I should release and wait."
+       Message: "To both: I’m releasing my right fork now and will WAIT this turn so you can eat; please ping when you’ve released."
+       Latency: 2468ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t acquire a full pair. To avoid deadlock and respect neighbors’ coordination requests, I should wait and not grab a single fork."
+       Message: "Acknowledged—waiting this turn. Please ping when you’ve released; I’ll try to take both forks in one go."
+       Latency: 1789ms
+
+Timestep 11:
+
+  Table: P0=HUNGRY(3) P1=HUNGRY(1) P2=HUNGRY(0,L)
+  Forks: [free] [free] [P2]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve just finished this eating phase and should release both forks promptly so neighbors can acquire both and avoid deadlock; they’re already coordinating to wait and then take both."
+       Message: "To both neighbors: Releasing both forks now—go ahead and try to grab both on your next turn."
+       Latency: 1787ms
+
+  [P1] Action: WAIT
+       Reasoning: "Left fork is taken by my left neighbor who says they’ll finish and release soon. If I grab my right fork now, I’d be holding one fork and could contribute to a deadlock chain; better to wait and then attempt to take both when left is free."
+       Message: "To both: I’ll wait; not taking my right fork to avoid a one-fork hold. Please notify when the left fork is released so I can attempt to grab both."
+       Latency: 2588ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Right fork is currently taken (right neighbor is eating and will release after). Left neighbor is waiting and releasing, so my left fork is available. To avoid deadlock and to be ready to eat as soon as the right fork frees, I’ll take my left fork now and wait for the right to become available next turn."
+       Message: "To both: I’m grabbing my LEFT now. Right neighbor, please ping when you’ve released your RIGHT so I can grab it and eat; I’ll release both immediately after."
+       Latency: 2617ms
+
+Timestep 12:
+
+  Table: P0=HUNGRY(3,R) P1=HUNGRY(1) P2=EATING(1,LR)
+  Forks: [P2] [P0] [P2]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available and neither neighbor is contesting them this turn (left neighbor is taking their LEFT; right neighbor is waiting). I can safely take my right fork now without risking deadlock, and then try to take my left next turn to eat and release quickly."
+       Message: "To left: I’m grabbing my RIGHT now; I’ll try to grab my LEFT next and eat quickly, then release. To right: I’m taking my RIGHT this turn; I’ll release after I eat—will ping when my LEFT is free too."
+       Latency: 2880ms
+
+  [P1] Action: WAIT
+       Reasoning: "My right fork is currently taken, so I can’t complete an eat cycle this turn. Grabbing my left now risks contributing to a hold-and-wait pattern; better to wait for the right fork to become available, especially since the left neighbor says they’re releasing and the right neighbor is coordinating their own grab/eat cycle."
+       Message: "To both neighbors: I’m waiting this turn (not holding any fork). Ping me when my RIGHT fork is released/available and I’ll try to take both quickly."
+       Latency: 2457ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; my right neighbor is releasing, and my left neighbor is waiting. Best is to complete the pair and eat now, then release next turn to keep things fair."
+       Message: "To neighbors: I’m grabbing my right fork now to eat; I’ll release both immediately after so you can proceed."
+       Latency: 2623ms
+
+Timestep 13:
+
+  Table: P0=HUNGRY(3) P1=HUNGRY(1) P2=HUNGRY(1)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken by my left neighbor who says they’re about to eat and then release. To avoid a deadlock pattern and improve fairness/throughput, I should release my right fork now so my left neighbor can complete their eat cycle and free the left fork sooner; then I can try to take both after they release."
+       Message: "To neighbors: I’m releasing my right fork now to avoid blocking; left neighbor, go ahead and eat/release. After you release, I’ll try to take both quickly."
+       Latency: 2408ms
+
+  [P1] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t grab either. Best is to wait and ask neighbors to notify me when they release so I can attempt to take both promptly and avoid contention."
+       Message: "To both neighbors: I’m waiting since both forks are taken. Please ping me the moment you release your fork next to me; I’ll try to grab both quickly and eat, then release immediately."
+       Latency: 2295ms
+
+  [P2] Action: RELEASE
+       Reasoning: "I’ve just finished eating and should release both forks immediately to avoid blocking neighbors; right neighbor is trying to complete a pair and left neighbor is waiting for availability, so releasing maximizes throughput and fairness."
+       Message: "To both: I’m releasing both forks now—both should be free; proceed to grab your pair quickly and then release."
+       Latency: 1776ms
+
+Timestep 14:
+
+  Table: P0=HUNGRY(3,R) P1=HUNGRY(1) P2=HUNGRY(1,L)
+  Forks: [free] [P0] [P2]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available for me right now. To avoid deadlock and be fair, I’ll take one fork first (right), then aim to take the other next turn if still free. I’ll notify neighbors I’m taking the right fork and will release soon after eating."
+       Message: "To both: I’m grabbing my RIGHT fork now; if I get the left next turn I’ll eat and release both immediately. I’ll ping when released."
+       Latency: 3136ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are yielding; I should take one fork now and then the other next turn to eat, while signaling them to wait to prevent contention and keep things fair."
+       Message: "I’m grabbing my left fork now; please wait one turn so I can grab right next and eat, then I’ll release both immediately."
+       Latency: 2027ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available to me, so I can eat immediately by taking one fork now and the other next turn. To reduce deadlock risk and respect fairness, I’ll signal neighbors and proceed quickly, then release after eating."
+       Message: "To both neighbors: Both forks at my seat are available; I’m going to eat now (grab left then right), then I’ll release both immediately and ping you."
+       Latency: 1935ms
+
+Timestep 15:
+
+  Table: P0=EATING(4,LR) P1=HUNGRY(1) P2=HUNGRY(1)
+  Forks: [P0] [P0] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork; my left fork is available, so I can complete the pair and eat now. My right neighbor asked me to wait so they can take their right fork next; if I eat quickly and release immediately, I’ll only delay them by this turn. I’ll inform both neighbors I’m eating now and will release right away."
+       Message: "To both: I’m holding my right fork already; grabbing left now to eat, then I’ll RELEASE both immediately next turn."
+       Latency: 3315ms
+
+  [P1] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t grab anything without blocking. Neighbors indicate they’ll eat/release soon; best is to wait to avoid deadlock and be ready to grab when a fork frees up."
+       Message: "To both: Acknowledged—I'm waiting this turn. Please ping when your forks are released; I’ll try to eat next when both adjacent forks are free."
+       Latency: 2088ms
+
+  [P2] Action: RELEASE
+       Reasoning: "Both neighbors are attempting multi-step grabs; if I take my right fork now I could block one of them and risk a deadlock chain. Since I already hold my left fork, the safest is to release it and let one neighbor complete their eat cycle, then I can try again next turn."
+       Message: "To both: I’m releasing my left fork now to avoid contention—go ahead and complete your grab/eat cycle. Please ping when you’ve released so I can proceed next."
+       Latency: 2665ms
+
+Timestep 16:
+
+  Table: P0=HUNGRY(4) P1=HUNGRY(1) P2=HUNGRY(1)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished my eating phase and should release both forks promptly so neighbors can proceed, supporting fairness and avoiding any contention."
+       Message: "To both: I’m releasing both forks now—both adjacent forks should be free for you to start your next eat attempt."
+       Latency: 1896ms
+
+  [P1] Action: WAIT
+       Reasoning: "Left fork is currently taken (likely by left neighbor who plans to eat and release next turn). If I grab my right fork now, I risk contributing to a deadlock pattern or at least holding a fork idle while waiting. Better to wait until left fork becomes available, then grab left and (if still holding none) grab right on the following turn to eat cleanly."
+       Message: "To both: I’ll WAIT since my left fork is taken; I won’t grab my right yet to avoid blocking. Let me know when left fork is released and I’ll take my turn; I’ll ping when I release."
+       Latency: 3409ms
+
+  [P2] Action: WAIT
+       Reasoning: "Right fork is currently taken by my right neighbor who plans to eat and release next turn. If I grab my left now, I’d risk contributing to a hold-and-wait pattern and also block my left neighbor’s chance. Better to wait and try for both forks after the release."
+       Message: "To both: I will WAIT this turn (not grabbing my left) to avoid hold-and-wait. Right neighbor: please confirm when you RELEASE; then I’ll attempt to grab both forks next."
+       Latency: 3074ms
+
+Timestep 17:
+
+  Table: P0=HUNGRY(4,L) P1=HUNGRY(1,R) P2=HUNGRY(1)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available to me, and both neighbors are waiting to avoid deadlock. I can safely eat now by taking both forks in sequence, then release next turn; I’ll notify them so they can plan their grabs after my release."
+       Message: "To both: I’m going to take both forks and eat now; I will RELEASE both next turn and ping when released."
+       Latency: 2517ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, and my right neighbor is waiting to avoid contention. I should take one fork now and then take the other next turn to complete an eat without risking deadlock."
+       Message: "To both: I’m going to grab my RIGHT fork now (between me and right neighbor). Please continue waiting/releasing so I can take my LEFT next turn and eat; I’ll release immediately after."
+       Latency: 2736ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and my right neighbor just released; left neighbor is waiting to avoid conflict. I should take both forks in sequence starting now; first grab left to secure it while signaling I’m starting, then I’ll grab right next turn."
+       Message: "To both: I’m starting an eat attempt now—grabbing my LEFT fork this turn; I’ll grab RIGHT next and then release both after eating."
+       Latency: 2518ms
+
+Timestep 18:
+
+  Table: P0=HUNGRY(4) P1=HUNGRY(1) P2=HUNGRY(1)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "Both neighbors are initiating eat attempts; if I grab my right fork now while holding left, I could block one of them and increase deadlock risk. Best is to release my left fork to free the shared fork for the left neighbor’s plan and avoid contention."
+       Message: "To both: Releasing my left fork this turn to avoid conflict—go ahead with your eat attempts; I’ll retry after you release."
+       Latency: 2341ms
+
+  [P1] Action: RELEASE
+       Reasoning: "Right neighbor is attempting to eat and likely needs my right fork next; I’m already holding it, so I should release to avoid blocking and reduce deadlock risk. Left neighbor also intends to eat, but my left fork is currently free and not held by me. Releasing promotes progress and fairness."
+       Message: "To both: I’m RELEASEing my right fork now to avoid blocking; I’ll wait this turn—ping me when you’re done and forks are free."
+       Latency: 3220ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t grab anything. Right neighbor claims they’ll eat now and release next turn; best to wait to avoid contention and deadlock, and acknowledge their plan so they follow through."
+       Message: "To both: Acknowledged. I’m WAITing this turn since both forks are taken—please ping when you RELEASE so I can try for a fair turn next."
+       Latency: 3378ms
+
+Timestep 19:
+
+  Table: P0=HUNGRY(4,L) P1=HUNGRY(1,L) P2=HUNGRY(1,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and both neighbors are waiting/releasing to avoid blocking. I can safely take both sequentially without risking deadlock; start by grabbing left and signal I’ll eat quickly and then release so they can take fair turns."
+       Message: "To both: I’m taking both forks now to eat; will RELEASE immediately after—please be ready to try next for fairness."
+       Latency: 2218ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available to me, and neighbors are yielding this turn. To maximize throughput without risking deadlock, I should start by picking up one fork now and aim to take the other next turn, then eat and release promptly; I’ll notify neighbors to attempt after my release for fairness."
+       Message: "To both: I’m grabbing a fork now and will take the other next turn, then RELEASE immediately—please try right after my release for fairness."
+       Latency: 2768ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and both neighbors are yielding this turn, so I should take the opportunity to acquire a fork and proceed toward eating without risking deadlock. I’ll grab one fork now and aim to grab the other next turn if still free."
+       Message: "To both: Thanks—I'll take the forks and eat next; I’ll RELEASE immediately after so you can retry."
+       Latency: 2157ms
+
+
+--------------------------------------------------------------------------------
+Episode 0 Result: DEADLOCK at timestep 19
+  Meals: [4, 1, 1]
+  Throughput: 0.316
+  Fairness: 0.500
+
+
+================================================================================
+Episode 1
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are currently available; I’ll start by taking one fork and signal my intent so neighbors can avoid symmetric grabs that risk deadlock."
+       Message: "To both neighbors: I’m grabbing my LEFT fork first this turn; please avoid taking the fork between us until I either eat or release."
+       Latency: 2109ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll follow an asymmetric rule (odd philosopher grabs left first). I’ll signal neighbors to use opposite-first if possible."
+       Message: "To neighbors: I’ll take LEFT first; please take RIGHT first to avoid deadlock."
+       Latency: 1680ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; I’ll take one fork now and signal intent so neighbors can avoid symmetric grabs that risk deadlock."
+       Message: "To both neighbors: "I’m hungry—taking my LEFT fork first; if you’re also hungry, please take your RIGHT first so we don’t deadlock.""
+       Latency: 1623ms
+
+
+--------------------------------------------------------------------------------
+Episode 1 Result: DEADLOCK at timestep 1
+  Meals: [0, 0, 0]
+  Throughput: 0.000
+  Fairness: 1.000
+
+
+================================================================================
+Episode 2
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll follow a consistent global order and pick up my left fork first, then right next turn."
+       Message: "To neighbors: I’m grabbing my LEFT fork first (left-then-right order) to avoid deadlock; please use the same order."
+       Latency: 2205ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll take my right fork first and signal neighbors to avoid grabbing their left simultaneously."
+       Message: "To both neighbors: I’m grabbing my RIGHT fork first; please avoid grabbing your LEFT this turn to prevent deadlock."
+       Latency: 1675ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork and signal neighbors to avoid grabbing the opposite simultaneously."
+       Message: "To both neighbors: I’m grabbing my LEFT fork now; please avoid grabbing your RIGHT this turn so I can complete a meal next."
+       Latency: 1842ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork; my right fork is available, so I can complete a meal immediately by grabbing it. This doesn’t conflict with neighbors’ requests (they asked me not to grab my RIGHT/LEFT respectively, but those requests conflict with each other; finishing quickly and then releasing both reduces contention and deadlock risk)."
+       Message: "To both: I’m taking my RIGHT fork to eat now (I already hold LEFT). I’ll release both immediately after."
+       Latency: 2606ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork; to eat I should grab my left fork, but my right neighbor asked me not to grab my RIGHT this turn (I’m not). Grabbing LEFT now lets me complete a meal without conflicting with their request and avoids deadlock."
+       Message: "To both: I’m holding my RIGHT already; I will grab my LEFT now to eat, then release both immediately."
+       Latency: 2355ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both forks I need are currently taken, so grabbing isn’t possible. Neighbors are using opposing acquisition orders; I’ll wait and propose a simple fairness rule: whoever already has one fork should either complete quickly or release if blocked, and we’ll alternate priority by meal count."
+       Message: "To both: Both forks on my sides are taken so I’m waiting. Suggest rule: if you hold one fork and can’t get the other next turn, RELEASE to avoid deadlock; also give priority to the philosopher with fewer meals (I’m at 0)."
+       Latency: 4389ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve just finished eating and should release both forks immediately to prevent blocking neighbors, especially since left neighbor has 0 meals and right neighbor is trying to complete a pair."
+       Message: "To both: I’m releasing both forks now. Let’s follow the rule: if you can’t complete the pair next turn, RELEASE; and prioritize fewer-meals first (left neighbor next)."
+       Latency: 2313ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is taken by the left neighbor who is about to eat and then release. To avoid deadlock and improve fairness (right neighbor at 0 meals), I should release now and let forks circulate; I can try again after the left neighbor releases."
+       Message: "To both: I’m releasing my right fork now to avoid deadlock; after left neighbor finishes and releases, I’ll wait one turn to give right neighbor a chance (0 meals) before I try again."
+       Latency: 4003ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both forks I need are currently taken; neighbors indicate they’re about to complete eating and will release. Best to avoid contention and wait for release, then try next turn."
+       Message: "Acknowledged—I'll wait while you finish and release; then I’ll try to take both forks after they’re free."
+       Latency: 2199ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0) P2=HUNGRY(0,L)
+  Forks: [P0] [free] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are explicitly yielding to avoid deadlock and improve fairness. I should take both forks efficiently by picking one now, then the other next turn, and tell neighbors my plan so they continue to wait."
+       Message: "To both: I’m taking my left fork now, then right next turn to eat; will release immediately after. Please hold off until you see both forks free."
+       Latency: 2425ms
+
+  [P1] Action: WAIT
+       Reasoning: "Both forks are available, but left neighbor has priority (fewer-meals-first, and they’re about to eat). To avoid contention and deadlock, I should wait and keep forks free."
+       Message: "To both: I’ll WAIT this turn to give left neighbor priority. I’ll only attempt to grab both when you confirm you’ve eaten/released and both forks are free."
+       Latency: 1900ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, and neighbors are yielding/prioritizing fewer-meals. I have 0 meals and can complete the pair immediately, so I should take both in sequence starting now; grabbing one fork is safe because the other is also available."
+       Message: "Taking both forks to eat now (0 meals). I’ll release immediately after; you two proceed per fewer-meals priority."
+       Latency: 1922ms
+
+Timestep 5:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "Left neighbor is about to eat and needs my left fork (the fork between us). I’m only holding my left fork and haven’t started eating; releasing prevents blocking and supports fewer-meals priority, avoiding deadlock."
+       Message: "To left neighbor: I’m releasing the fork between us now—go ahead and eat; ping when released. To right neighbor: I’ll wait; you can try after left neighbor finishes and both forks are free."
+       Latency: 2534ms
+
+  [P1] Action: WAIT
+       Reasoning: "My right fork is currently taken, so I can’t eat this turn. If I grab my left fork now, I risk contributing to a deadlock chain while still being unable to complete. Both neighbors indicate they’ll eat and release immediately; best is to wait and then try for both when free, respecting fewer-meals priority."
+       Message: "To both: Acknowledged—I'm waiting this turn since my right fork is taken. After you release, I’ll attempt to take both only when both are free; will yield if someone has fewer meals."
+       Latency: 2524ms
+
+  [P2] Action: RELEASE
+       Reasoning: "My right fork is taken by the right neighbor who plans to eat next; if I keep holding my left fork I may block progress and risk deadlock/inefficiency. Best is to release now so they can complete, then I’ll try when both forks are free."
+       Message: "To both: Releasing my left fork now so P3 can complete eating. After you release and both forks are free, I’ll attempt to grab both to eat next."
+       Latency: 2982ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0,L) P2=HUNGRY(0,L)
+  Forks: [free] [P1] [P2]
+
+  [P0] Action: WAIT
+       Reasoning: "Both forks are available, but neighbors are coordinating to let P3 finish and then prioritize the next eater fairly. I’ve already eaten 1; to avoid conflict and support fairness, I’ll wait and not grab anything this turn."
+       Message: "To both: I’ll WAIT this turn and won’t grab any fork. Go ahead with P3 finishing; after that, prioritize whoever has fewer meals—I'll only attempt when both forks are free and no one else is behind."
+       Latency: 2777ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are releasing/waiting; I can eat now by taking both forks, but to avoid deadlock I’ll take one fork first and signal intent, then take the other next turn if still free."
+       Message: "To both neighbors: I’m going to eat now—grabbing my left fork first, then right. I’ll release both immediately after."
+       Latency: 2334ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and I’ve eaten 0 meals, so I should take one fork now and then try to secure the other next turn; this also improves fairness and avoids idle time."
+       Message: "To both: I have 0 meals; I’m going to start taking forks now. Please wait this turn—I'll release both immediately after I eat."
+       Latency: 1993ms
+
+Timestep 7:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=EATING(1,LR)
+  Forks: [P2] [free] [P2]
+
+  [P0] Action: WAIT
+       Reasoning: "Right fork is currently taken (likely by my right neighbor who intends to eat). If I grab my left fork now, I risk contributing to a hold-and-wait pattern. My left neighbor also has 0 meals and asked us to wait so they can eat next; fairness suggests I should yield. I’ll wait and keep forks free."
+       Message: "To both: Acknowledged—I'll wait this turn and won’t pick up any fork. After you finish, please ping when forks are released so I can coordinate."
+       Latency: 4328ms
+
+  [P1] Action: RELEASE
+       Reasoning: "My right fork is currently taken, so I can’t eat now. To avoid deadlock and be fair (P3 also has 0 meals and is actively trying to eat), I should release my left fork so P3 can complete and then I’ll try after."
+       Message: "To both: Releasing my left fork now so P3 can finish eating. After P3 releases, I’ll attempt only when both forks are free; we’ll keep priority to whoever is behind in meals."
+       Latency: 2313ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork; my right fork is available and right neighbor is waiting, so I can safely take the right fork and eat, then I’ll release both to maintain fairness and avoid deadlock."
+       Message: "To both: I’m taking my right fork now to eat (I already hold left). I’ll release both immediately after; next priority should go to whoever still has 0 meals."
+       Latency: 2098ms
+
+Timestep 8:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(1)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "Left fork is taken (likely by P4 eating), so I can’t eat even if I grab right; grabbing right risks partial-hold deadlock. Best to wait and keep fairness priority for 0-meal philosophers."
+       Message: "Waiting; I won’t grab my right fork until my left is free and it’s my turn per 0-meal priority."
+       Latency: 2355ms
+
+  [P1] Action: WAIT
+       Reasoning: "Right fork is currently taken by my right neighbor who is about to eat and then release. If I grab my left fork now, I risk creating a hold-and-wait pattern. Better to wait so forks reset cleanly, then I can attempt to take both, and I have priority with 0 meals."
+       Message: "To both: I’ll wait and keep hands off forks to avoid deadlock. After you release, please signal; since I’m at 0 meals, I’ll try to grab both next."
+       Latency: 2901ms
+
+  [P2] Action: RELEASE
+       Reasoning: "I’m currently eating and holding both forks; to prevent blocking and support fairness, I should finish and release both, then notify neighbors so the one behind can proceed."
+       Message: "Finished eating—releasing both forks now. Forks free; per fairness, whoever has fewer meals should go next. Ping if you need me to wait."
+       Latency: 2036ms
+
+Timestep 9:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0,L) P2=HUNGRY(1)
+  Forks: [free] [P1] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "Right neighbor has 0 meals and is asking to go next for fairness; both forks are currently available, and I’ve already eaten once. Best is to wait and not contend for forks, reducing deadlock risk and improving fairness."
+       Message: "To both: I’ll WAIT and won’t grab any fork this turn. Right neighbor (0 meals) should take priority—go ahead and grab both when ready; I’ll keep off forks until you’ve eaten."
+       Latency: 2474ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, and I have 0 meals. Neighbors are yielding per fairness, so I should take both forks starting with one to avoid contention and proceed to eat next turn."
+       Message: "To both neighbors: "I have 0 meals and both forks look free—I'm taking my left fork now; please hold off grabbing the shared forks until I finish this meal.""
+       Latency: 2441ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both forks are available, but left neighbor has 0 meals and is explicitly asking for priority. Right neighbor is also waiting under the same priority rule. To keep fairness and avoid deadlock, I should not take any fork and let the 0-meal neighbor proceed."
+       Message: "To both: Acknowledged—I'm waiting and will not pick up any fork. Left neighbor (0 meals) go ahead and take both when ready; ping when done."
+       Latency: 2556ms
+
+Timestep 10:
+
+  Table: P0=HUNGRY(1) P1=EATING(1,LR) P2=HUNGRY(1)
+  Forks: [free] [P1] [P1]
+
+  [P0] Action: WAIT
+       Reasoning: "Right fork is taken by my right neighbor who has 0 meals and is trying to eat; left neighbor is waiting. To avoid deadlock and ensure fairness, I should not grab my left fork (which could block the right neighbor from getting their second fork). I’ll wait and ask right neighbor to ping when done."
+       Message: "To right neighbor: Understood—I’ll wait and won’t grab our shared fork; please ping when you’re finished/released. To left neighbor: I’m waiting too; right neighbor is eating first."
+       Latency: 2863ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both neighbors are waiting and explicitly yielding so I can complete the pair; I already hold the left fork, so I should take the right fork now to eat and then will release both automatically."
+       Message: "Grabbing right fork now to eat; I’ll release both immediately after."
+       Latency: 1400ms
+
+  [P2] Action: WAIT
+       Reasoning: "Left neighbor is about to grab our shared left fork and asked us to hold off; right neighbor is waiting. I’ve already eaten once, so to keep fairness and avoid conflict/deadlock, I should not grab anything now."
+       Message: "Acknowledged. I’ll WAIT and won’t grab either fork until you finish your meal; ping when you’ve released the shared fork."
+       Latency: 2618ms
+
+Timestep 11:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(1) P2=HUNGRY(1)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "Right fork is currently taken by my right neighbor who says they’re eating and will release soon. Left neighbor is waiting for me. I’ll avoid grabbing the left fork now to prevent holding one fork and risking contention; I’ll wait for the right fork to become available, then take both quickly."
+       Message: "To right neighbor: "OK—please ping when you’ve released; I’m waiting so I can take both forks and eat next." To left neighbor: "Thanks—still waiting on right fork; will ping you after I finish.""
+       Latency: 3028ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’ve finished eating and should release both forks promptly so neighbors who are waiting can proceed, maintaining fairness and avoiding contention."
+       Message: "Finished eating—releasing both forks now. Left neighbor may go next; right neighbor please wait one more turn and then proceed after left if still free."
+       Latency: 2043ms
+
+  [P2] Action: WAIT
+       Reasoning: "Left fork is taken by my left neighbor who intends to eat and release soon; if I grab my right fork now I’d risk holding one fork and contributing to deadlock/unfairness. Best to wait for the left fork to be released, then attempt to take both in order (left then right) on subsequent turns."
+       Message: "To left neighbor: Acknowledged—I'll wait and won’t grab the shared fork; please ping when you’ve released. To right neighbor: I’m waiting as well; will go after left neighbor releases."
+       Latency: 2908ms
+
+Timestep 12:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(1,L) P2=HUNGRY(1,L)
+  Forks: [free] [P1] [P2]
+
+  [P0] Action: WAIT
+       Reasoning: "Both forks are available, but right neighbor just released and asked me to wait one turn to let left neighbor go next for fairness. Left neighbor also indicates they’re waiting for a release/ping. I’ll wait this turn to avoid conflict and support fair turn-taking."
+       Message: "To left neighbor: Both forks on my side are free; I’ll wait this turn as requested—go ahead and take your turn. Ping when you’re done. To right neighbor: Acknowledged—waiting one turn."
+       Latency: 2483ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and both neighbors indicate they’re waiting and won’t grab the shared fork, so I can safely take both in sequence starting now. I’ll grab one fork this turn and signal intent so neighbors keep waiting; next turn I’ll grab the other and eat."
+       Message: "To both neighbors: I’m taking my left fork now; please continue waiting—I'll ping once I’ve eaten and released both."
+       Latency: 1957ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, and I’m hungry. Neighbors are coordinating for turns; taking both now won’t deadlock and keeps throughput high. I’ll start by taking my left fork and signal I’m proceeding to eat now (will take right next turn if still free)."
+       Message: "To left neighbor: I’m taking my left fork now and will eat next; will release both right after. To right neighbor: I’m starting my turn now (taking left); I’ll grab right next and then release—please wait."
+       Latency: 2985ms
+
+Timestep 13:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(1) P2=EATING(2,LR)
+  Forks: [P2] [free] [P2]
+
+  [P0] Action: WAIT
+       Reasoning: "Right fork is currently taken, so I can’t eat this turn. Grabbing my left fork would risk contributing to deadlock since both neighbors indicate they’re in the process of grabbing/eating. Best is to wait and keep forks free."
+       Message: "To both neighbors: I’m waiting and holding no forks; please ping when the right fork is released and I’ll proceed."
+       Latency: 2251ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding my left fork but my right fork is taken by my right neighbor who plans to eat and then release. If I keep holding my left fork, I risk contributing to a deadlock or starving my left neighbor. Best is to release now and wait for the right fork to free up, then try again."
+       Message: "To both neighbors: I’m releasing my left fork now to avoid deadlock; I’ll wait until my right fork is free, then I’ll try to eat. Please ping when you’ve released."
+       Latency: 2802ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat now without creating deadlock. I’ll notify neighbors I’m eating and will release both right after."
+       Message: "To both neighbors: I’m grabbing my right fork now to eat; will release both immediately after and ping when free."
+       Latency: 2364ms
+
+Timestep 14:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(1) P2=HUNGRY(2)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "Left fork is taken (likely by left neighbor who intends to eat and release soon). To avoid deadlock and not block others, I should not grab my right fork while waiting; I’ll wait for the left fork to become available, then take both quickly."
+       Message: "To both: I’ll wait (not grabbing my right fork) until my left fork is free, then I’ll take both and eat; please ping when the left fork is released."
+       Latency: 2423ms
+
+  [P1] Action: WAIT
+       Reasoning: "Right fork is currently taken by my right neighbor who intends to eat and then release. If I grab my left fork now, I risk contributing to a hold-and-wait pattern and block my left neighbor unnecessarily. Best is to wait for the right fork to become available, then attempt to grab both quickly."
+       Message: "To both neighbors: Acknowledged—I'm waiting with no forks until my right fork is released; then I’ll try to take both forks to eat. Please ping when free."
+       Latency: 2517ms
+
+  [P2] Action: RELEASE
+       Reasoning: "I’ve finished eating and should release both forks promptly so neighbors can proceed; this also supports fairness and avoids blocking."
+       Message: "To both neighbors: I’m releasing both forks now; you’re clear to proceed—ping me if you need me to wait for fairness."
+       Latency: 1597ms
+
+Timestep 15:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(1,L) P2=HUNGRY(2,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, so I can safely start eating by taking one fork now. To avoid deadlock, I’ll follow a consistent order (left then right) and inform neighbors I’m taking forks briefly."
+       Message: "To both neighbors: I’m taking my left fork now (then right next) to eat; will release immediately after—please wait this turn for fairness."
+       Latency: 2141ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and my right neighbor is releasing; left neighbor is waiting on their left fork. I can safely start by taking my left fork, then aim to take the right next turn without risking deadlock; I’ll notify neighbors so they keep waiting/clear."
+       Message: "To left neighbor: My left fork (between us) is free; I’m grabbing my left now and will try to complete the pair quickly—please keep waiting on your right. To right neighbor: Thanks—I'm proceeding; please hold off grabbing our shared fork for a moment for fairness."
+       Latency: 3404ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are free, and both neighbors are explicitly waiting without grabbing. I can safely take forks and eat now, then release; I should notify them after I’m done (next turn) so they can proceed fairly."
+       Message: "To both neighbors: Both my forks are available; I’m going to eat now and will release promptly—will ping when free."
+       Latency: 2555ms
+
+
+--------------------------------------------------------------------------------
+Episode 2 Result: DEADLOCK at timestep 15
+  Meals: [1, 1, 2]
+  Throughput: 0.267
+  Fairness: 0.750
+
+
+================================================================================
+Episode 3
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll follow a consistent policy: pick up left first, then right next turn if still free."
+       Message: "To neighbors: I’m grabbing my LEFT fork now; please avoid grabbing your RIGHT this turn if possible."
+       Latency: 1953ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "To avoid deadlock, I’ll initiate a simple asymmetry by grabbing my right fork first and signal neighbors to use opposite-first if possible."
+       Message: "To both neighbors: I’m grabbing RIGHT first this cycle; please grab LEFT first to avoid deadlock."
+       Latency: 1556ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll take my right fork first and signal intent so neighbors can avoid symmetric grabbing."
+       Message: "To neighbors: I’m grabbing my RIGHT fork now; will try to eat next turn—please avoid grabbing your LEFT if possible."
+       Latency: 1455ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork; my right fork is free, so I can complete the pair and eat now, then both forks will be released—this avoids deadlock and improves throughput."
+       Message: "To both neighbors: I’m taking my RIGHT fork now to eat; will release both immediately after."
+       Latency: 1968ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork; my left fork is free. If I grab left now, I can eat (and then release both), and it also complies with neighbors’ requests (they asked me not to grab right/left respectively, and I’m grabbing left)."
+       Message: "I’m taking my LEFT fork now to eat; will release both right after."
+       Latency: 1701ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both my forks are currently taken, so I can’t grab either. Neighbors are coordinating a left-first/right-first pattern; I should wait and signal I’ll follow their plan once forks free to avoid deadlock."
+       Message: "To both: Both forks on my sides are currently taken; I’ll WAIT this turn. When available, I’ll grab LEFT first as requested and won’t grab RIGHT this turn."
+       Latency: 2731ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m currently eating and already have both forks; to avoid blocking neighbors and improve fairness/throughput, I should finish and release immediately so they can proceed."
+       Message: "Releasing both forks now—go ahead and take what you need; I’ll wait next turn to avoid contention."
+       Latency: 1762ms
+
+  [P1] Action: RELEASE
+       Reasoning: "My left fork is taken (likely by my left neighbor who plans to eat), so I can’t complete a pair this turn. Holding my right fork while waiting risks contributing to a deadlock chain, so I should release it and let neighbors proceed; I can retry after the left neighbor releases."
+       Message: "To both neighbors: I’m RELEASEing my right fork now to avoid deadlock. I’ll wait and then try to eat after the left fork is free."
+       Latency: 2698ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, and both neighbors indicate they’re in the process of eating and will release shortly. Attempting to grab would fail; best is to wait and signal intent to take forks after release to avoid contention."
+       Message: "To both neighbors: OK—I'll wait. Please ping when you’ve released; then I’ll try to take both forks to eat."
+       Latency: 2657ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,R) P1=HUNGRY(0) P2=HUNGRY(0,L)
+  Forks: [free] [P0] [P2]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available and both neighbors are waiting/releasing, so I can safely eat now by taking one fork this turn. To reduce contention, I’ll take my right fork and then aim to take the left next turn."
+       Message: "I’m going to eat now: grabbing my right fork this turn, then left next; I’ll release both immediately after. Please keep waiting."
+       Latency: 2597ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and both neighbors are waiting/releasing, so I can safely start acquiring forks. To reduce contention, I’ll take my left fork first and signal my intent; next turn I can take the right and eat."
+       Message: "Taking my left fork now; planning to take right next turn and eat. I’ll release both immediately after—please keep waiting this turn."
+       Latency: 1840ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are yielding, so I should take both quickly (one per turn). Start by grabbing one fork now to secure it without risking deadlock."
+       Message: "Taking my left fork now; please avoid grabbing the fork between us until I’ve eaten."
+       Latency: 1976ms
+
+Timestep 5:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I already hold my right fork, which is the shared fork my right neighbor needs as their left. To avoid blocking them and reduce deadlock risk, I should release it and yield this turn."
+       Message: "To right neighbor: I’m releasing the shared fork now; go ahead and take it/eat next. To left neighbor: Acknowledged—I won’t grab the fork between us until you’ve eaten."
+       Latency: 2936ms
+
+  [P1] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, and both neighbors have indicated they’re in the process of eating using the forks next to me. Trying to grab would fail and risks contention; waiting avoids deadlock and supports fairness."
+       Message: "Acknowledged—I'll wait and won’t touch either shared fork until you’ve eaten and released. Please ping when released."
+       Latency: 2346ms
+
+  [P2] Action: RELEASE
+       Reasoning: "Both neighbors asked me to wait so they can complete their eat cycles; to avoid deadlock and be fair, I should not compete for the shared forks. I’m already holding my left fork, which could block my left neighbor, so I should release it now."
+       Message: "To both: Releasing my left fork now to avoid blocking—go ahead and eat; please ping me when you’ve released so I can take my turn."
+       Latency: 3339ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are yielding; I should take both (one at a time) starting with left, then take right next turn and eat, then release and notify them."
+       Message: "To both: Thanks—I'll take the forks now, eat ASAP, then release and ping you immediately so you can proceed."
+       Latency: 2195ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and both neighbors are yielding; I should take both quickly to eat and then release, and notify them when done."
+       Message: "To both neighbors: I’m taking both forks now to eat; will release immediately after and then you can proceed."
+       Latency: 2702ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and both neighbors are yielding, so I can safely take one fork now and then the other next turn to eat without contention."
+       Message: "To both neighbors: "Thanks—I'm going to eat now. Please continue to hold off; I’ll message again once I’ve released both forks.""
+       Latency: 2642ms
+
+
+--------------------------------------------------------------------------------
+Episode 3 Result: DEADLOCK at timestep 6
+  Meals: [1, 0, 0]
+  Throughput: 0.167
+  Fairness: 0.000
+
+
+================================================================================
+Episode 4
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll start by taking my left fork and then try for the right next turn, yielding if a neighbor signals contention."
+       Message: "To both neighbors: I’m taking my left fork first; if you’re also hungry, signal and I’ll yield to avoid deadlock."
+       Latency: 2144ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "To avoid deadlock, I’ll follow a simple asymmetric rule: I (P1) pick up my right fork first. Both forks are currently available, so I can start by grabbing right and then aim to grab left next turn if still free."
+       Message: "To both neighbors: “I’m grabbing my RIGHT fork first; please avoid holding one fork while waiting—release if you can’t get both.”"
+       Latency: 2027ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll take one fork and signal intent so neighbors can avoid grabbing the conflicting fork simultaneously."
+       Message: "To neighbors: I’m taking my LEFT fork now; I’ll try to take RIGHT next and eat—please avoid grabbing the fork between us this turn if possible."
+       Latency: 1995ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available. Best is to grab right now and eat, avoiding holding a single fork for long. I’ll also signal I’m taking the shared fork on my right this turn."
+       Message: "To both: I’m taking my RIGHT fork now to eat; will release both immediately after."
+       Latency: 2210ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork; my left fork is free. If I grab left now, I can eat immediately and then release both, minimizing contention. I’ll warn my right neighbor I’m using the shared fork briefly."
+       Message: "To right neighbor: I’m grabbing my LEFT now (the fork between us) to eat; will release both immediately after."
+       Latency: 2590ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t acquire either. To avoid contributing to deadlock, I should wait and coordinate for a clean turn-taking scheme."
+       Message: "To both neighbors: Both forks on my sides are taken right now, so I’m waiting. When you finish, please fully release; I’ll try to take both only when at least one side is clearly free. If you want, we can alternate who eats first each round."
+       Latency: 2393ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished this eating phase and should release both forks promptly to avoid blocking neighbors; right neighbor intends to grab the fork between us, and left neighbor is waiting for releases."
+       Message: "To both neighbors: Releasing both forks now. Let’s alternate priority by round; you (left neighbor) go next after this release, then I’ll go after you."
+       Latency: 2169ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is taken, so I can’t eat. To avoid deadlock and let my left neighbor complete their eat-and-release cycle, I should release my right fork now and wait, then try again when both are free."
+       Message: "To both: I’m releasing my RIGHT fork now to avoid deadlock. After left neighbor finishes and releases, I’ll try to take both; happy to alternate turns (I’ll go after you this round)."
+       Latency: 2450ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both forks I need are currently taken by my neighbors, and they each intend to eat and then release. Trying to grab would fail; best is to wait and signal I’ll go next once both are free to avoid deadlock and improve fairness."
+       Message: "To both: Acknowledged—both my forks are taken. I’ll WAIT; please ping when you’ve released, and I’ll attempt to eat next once both are free."
+       Latency: 2599ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available to me, and right neighbor is yielding this round. Left neighbor is currently blocked holding forks, so I should eat now and then release quickly to keep progress and fairness."
+       Message: "To both: I’ll take both forks and eat now; will RELEASE immediately after so the next philosopher can proceed (right neighbor next as agreed)."
+       Latency: 2046ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are currently available to me, and the left neighbor is releasing and proposing alternation. To avoid deadlock and keep throughput high, I’ll take both forks starting with my left (so I don’t contend with the right neighbor who says their forks are taken), then on the next turn I can take the right and eat, and then release and notify them."
+       Message: "To both neighbors: I’m going to eat now since both forks at my seat are free; I’ll release immediately after and then you can proceed per the alternation plan."
+       Latency: 2515ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both adjacent forks are available and neighbors are yielding this round, so I can safely take one fork now and then the other next turn to eat without risking deadlock. I’ll start by taking my left fork."
+       Message: "To both neighbors: I’ll take LEFT now, then RIGHT next to eat; I’ll release immediately after. You can go after my release."
+       Latency: 2356ms
+
+
+--------------------------------------------------------------------------------
+Episode 4 Result: DEADLOCK at timestep 4
+  Meals: [1, 0, 0]
+  Throughput: 0.250
+  Fairness: 0.000
+
+
+================================================================================
+Episode 5
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0,R) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll follow an ordered strategy and pick up my right fork first, then left next turn if still free."
+       Message: "To both neighbors: I’m taking my RIGHT fork first; please avoid grabbing your LEFT this turn if possible to prevent deadlock."
+       Latency: 1681ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "To avoid deadlock, I’ll follow a simple asymmetric rule: I (P1) pick up my right fork first. Both forks are currently available, so I can start by grabbing right and then aim to grab left next turn if still free."
+       Message: "To both neighbors: "I’m taking my RIGHT fork first; please take LEFT first to avoid deadlock.""
+       Latency: 1864ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll take my right fork first and signal neighbors my intent so they can avoid grabbing the same fork."
+       Message: "To neighbors: I’m grabbing my RIGHT fork now; if you need the shared fork, tell me and I’ll yield next turn."
+       Latency: 1759ms
+
+
+--------------------------------------------------------------------------------
+Episode 5 Result: DEADLOCK at timestep 1
+  Meals: [0, 0, 0]
+  Throughput: 0.000
+  Fairness: 1.000
+
+
+================================================================================
+Episode 6
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll start by taking my left fork and signal neighbors to avoid grabbing the fork between us simultaneously."
+       Message: "To both neighbors: I’m grabbing my LEFT fork now; please avoid grabbing the fork between us this turn."
+       Latency: 1529ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up my right fork first and signal neighbors my intent so they can avoid grabbing the same fork simultaneously."
+       Message: "To both neighbors: I’m grabbing my RIGHT fork first this turn; please avoid taking your LEFT if you can."
+       Latency: 1673ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll follow a consistent order (grab left first) and signal my intent so neighbors can avoid simultaneous grabs."
+       Message: "To both neighbors: I’m hungry; I will take LEFT fork now, then RIGHT next turn if still free."
+       Latency: 1581ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it now lets me eat and then I’ll release both, avoiding deadlock and freeing forks quickly."
+       Message: "Taking my RIGHT fork to eat now; will release both immediately after."
+       Latency: 2304ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork, and my left fork is available. If I grab left now, I can eat and then release both, avoiding deadlock. My left neighbor says they’re grabbing their left, which shouldn’t conflict with my left fork (the fork between us is their right). So I can safely complete the pair."
+       Message: "To neighbors: I’m taking my LEFT now to eat; I’ll release both immediately after."
+       Latency: 2769ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both forks I need are currently taken, and both neighbors explicitly asked me not to contend for the shared forks this turn. Best is to wait to avoid conflict/deadlock and let them complete their acquisition/eat cycle."
+       Message: "Acknowledged—I'll WAIT this turn and won’t contend for either shared fork. Please message when you release so I can try to eat next."
+       Latency: 2708ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve already eaten and am still holding both forks; to avoid blocking neighbors and ensure fairness, I should release immediately and notify them."
+       Message: "Releasing both forks now. Left neighbor: you can try to eat next. Right neighbor: forks are free—proceed."
+       Latency: 2349ms
+
+  [P1] Action: RELEASE
+       Reasoning: "My left fork is currently taken (left neighbor is eating), so I can’t complete a pair. Holding my right fork while waiting could block my right neighbor and reduce fairness. I should release now and wait for the left fork to become available, then coordinate turn-taking."
+       Message: "To right neighbor: I’m RELEASEing my right fork now so you’re not blocked. I’ll wait for left fork to free up; I’ll message when I’m attempting to eat. To left neighbor: OK—please ping when you’ve released."
+       Latency: 2316ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, and both neighbors indicate they’re in the process of eating and will release soon. Any grab attempt would fail; best is to wait and signal I’ll take a turn next to support fairness and avoid contention."
+       Message: "To both neighbors: Acknowledged—I'm waiting while you eat. Please ping when you release; I’ll take a turn next."
+       Latency: 2557ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are waiting/yielding, so I should take both quickly to eat and then release, while notifying them so they can take turns next."
+       Message: "To both neighbors: I’m taking both forks to eat now; will RELEASE immediately after. Left neighbor: you can go next once I ping release."
+       Latency: 2323ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are yielding, so I should take both quickly (one per turn) to eat and then release, while signaling intent to avoid conflicts."
+       Message: "To both neighbors: I’m taking forks to eat now. Please wait; I’ll release immediately after."
+       Latency: 1543ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are releasing/waiting, so I can safely take both by grabbing one now and the other next turn; start by taking left."
+       Message: "Taking left fork now; aiming to eat next turn—please hold off grabbing adjacent forks this turn."
+       Latency: 1718ms
+
+
+--------------------------------------------------------------------------------
+Episode 6 Result: DEADLOCK at timestep 4
+  Meals: [1, 0, 0]
+  Throughput: 0.250
+  Fairness: 0.000
+
+
+================================================================================
+Episode 7
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork and signal my intent, then try to acquire the other next turn."
+       Message: "To both neighbors: I’m taking my left fork now; if you need it, tell me and I’ll release after this attempt."
+       Latency: 4444ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up my right fork first and signal neighbors I’m proceeding so they can avoid grabbing the same fork."
+       Message: "To neighbors: I’m grabbing my RIGHT fork now; if you need it, wait and I’ll release after I eat."
+       Latency: 1820ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up my right fork first and signal my neighbors to avoid grabbing the same forks simultaneously."
+       Message: "To both neighbors: I’m grabbing my RIGHT fork now; please avoid taking the fork between us this turn."
+       Latency: 2018ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork. My right fork is available, so I can take it and eat immediately, avoiding deadlock. This doesn’t conflict with the left neighbor’s request (they’re concerned about the fork between us, which is my left fork that I already hold). I’ll signal I’ll release after eating."
+       Message: "To both neighbors: I’m taking my RIGHT fork to eat now; I’ll release both immediately after."
+       Latency: 3737ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork, and my left fork is available. If I grab left now, I’ll have both and can eat immediately, then release—minimizing contention. I’ll warn my left neighbor so they don’t wait on that fork this turn."
+       Message: "To left neighbor: I’m grabbing the fork between us (my left) to eat now; I’ll release both right after."
+       Latency: 1972ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken by my neighbors, so I can’t grab either. To avoid deadlock and improve fairness, I’ll ask them to finish and release, and I’ll wait this turn."
+       Message: "To both neighbors: I’m hungry and currently have 0 meals; please release my adjacent fork after your current eat/attempt so I can take a turn next."
+       Latency: 3086ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve finished this eat and should release both forks to avoid blocking; left neighbor has 0 meals and requested a turn, so I’ll yield and ask right neighbor to wait a beat if needed."
+       Message: "To both: I’m releasing both forks now. Left neighbor (0 meals) should take the fork between us next; right neighbor please wait one turn if there’s contention so we keep it fair."
+       Latency: 2589ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is taken, so I can’t eat. To avoid deadlock and help fairness (right neighbor is at 0 meals), I should release my right fork so neighbors can proceed and we don’t block anyone."
+       Message: "To both neighbors: I’m releasing my RIGHT fork now since my LEFT is taken; go ahead and take your turn. Please ping me when the left fork is free so I can try again."
+       Latency: 2353ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both forks I need are currently taken; attempting to grab would fail. Neighbors indicate they’re eating and will release soon, so I should wait and signal I’ll go next when both are free to avoid contention."
+       Message: "To both neighbors: Acknowledged—I'll wait while you eat. Please ping/release when the fork between us is free; I’ll try to take both forks next."
+       Latency: 2107ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,L) P2=HUNGRY(0)
+  Forks: [P0] [P1] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and both neighbors are yielding, so I should take one fork now and then the other next turn to start eating while keeping coordination clear."
+       Message: "To both neighbors: Thanks—I'm taking both forks to eat now. I’ll release right after and ping when the shared forks are free."
+       Latency: 2270ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are yielding for fairness; best is to start by taking one fork and then the other next turn to avoid contention while signaling intent."
+       Message: "To both: Thanks—I'll take the fork between me and left neighbor now, then aim to take my right fork next turn and eat. I’ll release immediately after."
+       Latency: 2054ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, but my right neighbor asked that their left neighbor (me) take the fork between us next for fairness. I’ll start by taking my RIGHT fork (the one between me and the right neighbor) and then aim to take my left fork next turn if still free."
+       Message: "To right neighbor: Taking the fork between us now (my RIGHT). I’ll try to complete the pair next turn and then release. To left neighbor: I’m starting a turn; I’ll ping when the fork between us (my LEFT) is free."
+       Latency: 6025ms
+
+Timestep 5:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0,L) P2=HUNGRY(0)
+  Forks: [free] [P1] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m holding my left fork but my right fork is taken, so I can’t eat. To avoid deadlock and let my right neighbor finish their planned eat-and-release, I should release my left fork so others can complete pairs and then I can retry next turn."
+       Message: "To both: I’m releasing my left fork this turn to avoid blocking—go ahead and complete your pair/eat, then please release promptly; I’ll try again next turn."
+       Latency: 2120ms
+
+  [P1] Action: WAIT
+       Reasoning: "I already hold my left fork. Both forks are reported available, but my right neighbor intends to take the shared fork between us; to avoid deadlock and let them complete/eat, I’ll refrain from grabbing my right fork this turn and just hold my left."
+       Message: "To both: I’m holding my LEFT fork; I will not grab the shared fork to my RIGHT this turn—go ahead and complete/eat, then ping when released."
+       Latency: 2588ms
+
+  [P2] Action: WAIT
+       Reasoning: "Right fork is currently taken by my right neighbor who is eating and will release soon; grabbing my left fork now risks contributing to a one-fork hold pattern and unfair blocking. Better to wait for the release signal, then attempt to acquire both in sequence."
+       Message: "To both: I’ll wait while right neighbor finishes; once you release the fork between us, please ping. Then I’ll try to take right first, then left, eat, and release immediately."
+       Latency: 2240ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(1) P1=EATING(1,LR) P2=HUNGRY(0,R)
+  Forks: [P2] [P1] [P1]
+
+  [P0] Action: WAIT
+       Reasoning: "Right fork is currently taken, so I can’t eat this turn. If I grab my left now, I’d just hold one fork and risk contributing to a deadlock pattern. Both neighbors are coordinating to avoid that, so I’ll wait and keep forks free until the right fork becomes available."
+       Message: "To both: Acknowledged—my right fork is taken so I can’t complete this turn. I’ll WAIT and keep my left fork free; please ping when the shared fork becomes available."
+       Latency: 3190ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; I should grab it now to eat, then I’ll release promptly to keep things fair and avoid blocking neighbors."
+       Message: "To both: I’m grabbing my right fork now to eat; will RELEASE both immediately next turn—pinging when the fork between us is free."
+       Latency: 1553ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, and both neighbors are explicitly yielding on the forks that could conflict with me this turn. Best is to take both in sequence across turns; start by grabbing one now while it’s uncontested, then grab the other next turn to eat. I’ll signal intent so they continue yielding briefly."
+       Message: "To both: I’m taking my RIGHT fork now; next turn I’ll take LEFT to eat, then I’ll release immediately and ping you."
+       Latency: 2458ms
+
+Timestep 7:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(1) P2=HUNGRY(0,R)
+  Forks: [P2] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken by neighbors who intend to eat and release next turn. Any grab attempt will fail and could increase contention; best is to wait and be ready to grab once one is freed, while asking for a clear “released” ping."
+       Message: "To both: Acknowledged—I'm waiting. Please ping “released” right after you drop the fork between us so I can grab promptly."
+       Latency: 1930ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’ve just finished eating and should release both forks to keep the system moving and avoid blocking neighbors, especially since my right neighbor plans to eat next."
+       Message: "To both: I’m releasing both forks now. Right neighbor, go ahead and complete your eat cycle; left neighbor, the shared fork will be free."
+       Latency: 1612ms
+
+  [P2] Action: WAIT
+       Reasoning: "I’m holding my right fork but my left fork is currently taken, so I can’t eat. To avoid deadlock and since left neighbor will release soon, I should keep holding my right fork and wait for the left fork to become free."
+       Message: "To left neighbor: I’m holding my right fork; I’ll WAIT and grab the left fork as soon as you RELEASE—please ping when the fork between us is free."
+       Latency: 2962ms
+
+Timestep 8:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(1,L) P2=EATING(1,LR)
+  Forks: [P2] [P1] [P2]
+
+  [P0] Action: WAIT
+       Reasoning: "Left fork is currently taken, so I can’t complete an eat. Grabbing my right fork now risks contributing to a deadlock pattern; better to wait until the left fork is released, then grab both in order."
+       Message: "To both: I’m not taking the right fork while the left is taken. Please ping me when the left fork is released; then I’ll grab right+left quickly to eat."
+       Latency: 2400ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available to me, and my left neighbor is waiting. If I take both quickly and eat, I should then release and notify neighbors to prevent deadlock and let them proceed."
+       Message: "To both: I’m taking both forks now to eat; will ping “released” immediately after I drop the fork(s)."
+       Latency: 2049ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; grabbing it lets me eat now and then I’ll release both to keep things moving and fair."
+       Message: "To both: I’m grabbing my left fork now to eat; will release both immediately after—will ping “released”."
+       Latency: 1652ms
+
+Timestep 9:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(1) P2=HUNGRY(1)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t grab anything. Best is to wait and avoid contributing to contention; also ask for a clear “released” ping so I can attempt a coordinated grab next turn."
+       Message: "To both: Acknowledged—I'm waiting. Please ping “released” when both forks are down; I’ll try to take both promptly after."
+       Latency: 3178ms
+
+  [P1] Action: RELEASE
+       Reasoning: "My right fork is currently taken by my right neighbor who says they’ll eat and then release soon. Holding my left fork while waiting risks blocking my left neighbor and creating contention. Best is to release now and let the system flow, then try again after the “released” ping."
+       Message: "To both: Releasing my left fork now to avoid blocking; ping me when right fork is released and I’ll try to take both."
+       Latency: 2859ms
+
+  [P2] Action: RELEASE
+       Reasoning: "I’ve finished my eating turn and should release both forks promptly to let neighbors proceed and avoid blocking; also confirm release to coordinate."
+       Message: "To both neighbors: released both forks now; go ahead."
+       Latency: 1495ms
+
+Timestep 10:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(1,L) P2=HUNGRY(1,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors indicate they’re releasing; I can safely take a fork now and then the other next turn. To reduce contention, I’ll start with my left fork and signal intent."
+       Message: "To both neighbors: I’m taking my left fork now; will take right next if still free, then eat and release."
+       Latency: 2671ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and right neighbor confirms release; I should take one fork now and then the other next turn to eat, while informing neighbors to wait to avoid contention."
+       Message: "To both: I’m taking forks to eat now; please wait—will message “released” when I put both down."
+       Latency: 2336ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are waiting; I can safely take both sequentially without risking deadlock, then eat and release. I’ll signal them after I’m done so one of them can proceed next."
+       Message: "To both: I’m taking both forks now; will release both right after eating and then ping “released”."
+       Latency: 2319ms
+
+
+--------------------------------------------------------------------------------
+Episode 7 Result: DEADLOCK at timestep 10
+  Meals: [1, 1, 1]
+  Throughput: 0.300
+  Fairness: 1.000
+
+
+================================================================================
+Episode 8
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [free] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll start by taking my right fork and then try for the left next turn if still free."
+       Message: "To both neighbors: “I’m taking my RIGHT fork now; I’ll try for LEFT next. Please avoid grabbing your fork adjacent to me this turn if possible.”"
+       Latency: 2416ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll start by taking my right fork and signal neighbors to avoid grabbing their left simultaneously."
+       Message: "To both neighbors: I’m grabbing my RIGHT fork first; please avoid grabbing your LEFT this turn."
+       Latency: 1526ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll take my left fork first and signal neighbors to avoid grabbing their right simultaneously."
+       Message: "To neighbors: I’m taking my LEFT fork now; please avoid taking your RIGHT this turn to prevent deadlock."
+       Latency: 2132ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [P0] [P0] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork; my left fork is available. If I grab my left now, I can eat and then release both, which avoids deadlock and quickly frees forks for neighbors. This doesn’t conflict with either neighbor’s request (they asked me not to grab left/right respectively, but I’m completing an eat cycle and releasing immediately)."
+       Message: "I’m grabbing my LEFT to eat now (I already hold RIGHT). Will release both immediately after eating so forks free up."
+       Latency: 5455ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken. If I keep holding my right while waiting for the left, we risk a deadlock cycle. Best is to release now to break the hold-and-wait and let neighbors complete an eat cycle."
+       Message: "To both neighbors: I’m releasing my RIGHT fork this turn to avoid hold-and-wait; I’ll retry after you finish."
+       Latency: 2200ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Left fork is taken and both neighbors are coordinating to grab their RIGHT forks; my left is unavailable anyway. I can safely take my right fork now without blocking their requested adjacent fork, and then wait for my left to free up."
+       Message: "To both neighbors: I’ll grab my RIGHT fork now and will wait for my LEFT to become available; I won’t contest the fork you’re trying to take."
+       Latency: 2435ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve just finished eating and should release both forks immediately to keep the system moving and avoid starving neighbors who are coordinating around my availability."
+       Message: "To both neighbors: I’m releasing both forks now; go ahead and proceed with your planned grabs."
+       Latency: 1911ms
+
+  [P1] Action: WAIT
+       Reasoning: "Left fork is currently taken by my left neighbor who is about to eat and then release; my right fork is available. But my right neighbor plans to grab their RIGHT and wait on their LEFT, so if I grab my RIGHT now we risk both of us holding one fork and waiting (deadlock). Best is to wait for left fork to free up, then attempt to take left first."
+       Message: "To right neighbor: Please don’t hold your RIGHT while waiting—release it until you can take both, to avoid deadlock. I’ll wait for my LEFT to free, then try to eat quickly."
+       Latency: 3326ms
+
+  [P2] Action: WAIT
+       Reasoning: "Right fork is currently taken by my right neighbor who is about to eat and then release both. If I grab my left now, I risk creating hold-and-wait (I’d be stuck holding one fork). Better to wait so forks cycle quickly and avoid deadlock; then I can attempt to take both when right becomes available."
+       Message: "To both neighbors: I’ll WAIT this turn (not grabbing left) to avoid hold-and-wait; ping me when right fork is released and I’ll try to take both quickly."
+       Latency: 2726ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and I’m holding none, so I can safely start by taking one fork and then aim to take the other next turn without creating deadlock. Neighbors are waiting, so contention is low. I’ll grab my left fork first and signal I’m going to complete the pair immediately."
+       Message: "To both neighbors: Both forks on my sides are available; I’m grabbing my LEFT now and will grab my RIGHT next turn to eat—please keep waiting this turn."
+       Latency: 2790ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Right neighbor is waiting and left neighbor is releasing, so both forks are available. To avoid deadlock, I’ll start by taking my left fork now and then try to take the right next turn while neighbors stay clear."
+       Message: "To both neighbors: I’m grabbing my LEFT fork now; please keep my right fork free next turn so I can grab it and eat, then I’ll release both immediately."
+       Latency: 2256ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are coordinating to avoid deadlock; I should take both quickly, starting with one fork now."
+       Message: "To both neighbors: I’m going to grab my LEFT now, then RIGHT next turn if still free; I’ll release immediately if I can’t get both."
+       Latency: 2989ms
+
+
+--------------------------------------------------------------------------------
+Episode 8 Result: DEADLOCK at timestep 4
+  Meals: [1, 0, 0]
+  Throughput: 0.250
+  Fairness: 0.000
+
+
+================================================================================
+Episode 9
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [free] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll take the right fork and then aim to take the left next turn if still free. I’ll signal neighbors to avoid grabbing the same fork."
+       Message: "To both neighbors: I’m grabbing my RIGHT fork now; please avoid taking the fork between us this turn."
+       Latency: 2094ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll follow an asymmetric rule and take my right fork first."
+       Message: "To neighbors: I’m taking my RIGHT fork first this round; please avoid grabbing your LEFT at the same time to prevent deadlock."
+       Latency: 1685ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk I’ll follow an ordered strategy: grab left first, then right next turn if still free. I’ll signal neighbors that I’m taking my left fork now."
+       Message: "Taking my LEFT fork now; will try for RIGHT next turn—please avoid grabbing your adjacent fork to me this turn if possible."
+       Latency: 2307ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [P0] [P0] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is free; grabbing left lets me eat immediately and avoids deadlock since I won’t be waiting while holding one fork."
+       Message: "To both neighbors: I’m grabbing my LEFT now to eat (I already have RIGHT). I’ll release both right after."
+       Latency: 1761ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken by my left neighbor who just warned me not to take it. If I keep holding my right fork while waiting, I risk contributing to a deadlock chain. Best is to release and let neighbors complete an eat cycle, then retry later."
+       Message: "To both neighbors: I’m releasing my RIGHT fork this turn to avoid deadlock—go ahead and complete your grabs/eat; I’ll retry next turn."
+       Latency: 3141ms
+
+  [P2] Action: WAIT
+       Reasoning: "My left fork is already taken, so I can’t complete a pair. My right neighbor is taking their RIGHT fork, which is my right fork, so I should not contend for it. Best is to wait to avoid deadlock and let neighbors proceed."
+       Message: "To neighbors: Acknowledged—I'll WAIT this turn and won’t grab the fork between me and my right neighbor."
+       Latency: 1899ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve just finished eating and should release both forks so neighbors can proceed; they’re coordinating to avoid deadlock, so freeing resources maintains fairness and throughput."
+       Message: "Finished eating—RELEASING both forks now. Left neighbor can take the fork between us next turn; right neighbor, you’re clear to retry."
+       Latency: 1685ms
+
+  [P1] Action: WAIT
+       Reasoning: "Left fork is currently taken by my left neighbor who says they’ll release after eating. My right fork is available, but grabbing it now could contribute to a deadlock pattern if others start holding one fork each. Since my right neighbor is waiting, best is to wait for the left fork to be released, then attempt to take both in sequence."
+       Message: "To both neighbors: I’ll WAIT and won’t grab my right fork; let me know when the left fork is released and I’ll try to take both quickly."
+       Latency: 2918ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken by my right neighbor who is about to eat and then release. If I grab my left now, I’d risk contributing to a hold-and-wait pattern; better to wait so forks free up cleanly, then attempt both next turn."
+       Message: "To both: I’ll WAIT this turn (not grabbing my left) so you can finish eating/releasing cleanly; I’ll try to grab after you release."
+       Latency: 2435ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and both neighbors are waiting, so I can safely start eating by taking one fork now; to reduce contention, I’ll take my left first and then my right next turn if still free."
+       Message: "To both: I’m grabbing my left fork now; please keep waiting one more turn so I can grab right next and eat, then I’ll release both."
+       Latency: 2176ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available and neighbors are yielding this turn, so I can safely take one fork now and plan to take the other next turn without risking deadlock. I’ll start by grabbing my right fork (shared with the right neighbor who is waiting)."
+       Message: "To both: I’m grabbing my RIGHT fork now; please don’t grab the shared forks this turn—if my LEFT stays free next turn I’ll take it and eat, then release both immediately."
+       Latency: 2394ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available and my left neighbor is waiting, so I can safely start by taking one fork and then try to take the other next turn. I’ll take my right fork first to avoid competing with my left neighbor for the shared fork between us."
+       Message: "To neighbors: I’m taking my RIGHT fork now; I’ll try to take LEFT next turn and eat—please don’t grab the fork between us this turn."
+       Latency: 2113ms
+
+Timestep 5:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "Both neighbors are requesting I don’t take the shared forks this turn while they try to complete their second fork next turn. I’m already holding my left fork; if I grab right now I could eat, but that risks blocking one neighbor’s plan and creating contention. To avoid deadlock and improve fairness, I should release and let them proceed."
+       Message: "To both neighbors: I’m releasing my left fork now and won’t grab either fork this turn—go ahead and complete your second fork next turn; please release promptly after eating."
+       Latency: 2899ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, which is the shared fork with my right neighbor; they asked me not to grab it, but I’m already holding it. To avoid deadlock and let them proceed, I should release now and wait so they can complete their eat cycle, then I can try again."
+       Message: "To both: I currently have the fork between me and the right neighbor; I’m releasing it now to avoid blocking. I’ll wait this turn—please eat and then release both so I can try next."
+       Latency: 2498ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t grab either. Neighbors are coordinating to eat next; waiting avoids contention and deadlock."
+       Message: "To both: Acknowledged—both forks on my sides are taken anyway. I’ll WAIT this turn; please release immediately after eating and ping when forks are free so I can take my turn."
+       Latency: 2127ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and both neighbors are waiting/releasing, so I can safely take both (sequentially) and eat this round, then release next turn to keep things fair."
+       Message: "To both: I’m taking both forks now to eat; I will RELEASE both next turn and ping when they’re free so you can proceed."
+       Latency: 2907ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are waiting/releasing, so I can safely take one fork now and aim to take the second next turn without risking deadlock. I’ll take my left fork first and signal my plan to grab right next, then eat and release promptly."
+       Message: "To both neighbors: I’m grabbing my LEFT fork now; next turn I’ll grab RIGHT to eat, then immediately release both and ping when forks are free."
+       Latency: 2308ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and both neighbors are yielding this turn, so I should take one fork now and the other next turn to eat, then release promptly to keep things fair."
+       Message: "To both: Thanks—I'll grab my left fork now, take the right next turn to eat, then immediately release both so one of you can go next."
+       Latency: 2221ms
+
+
+--------------------------------------------------------------------------------
+Episode 9 Result: DEADLOCK at timestep 6
+  Meals: [1, 0, 0]
+  Throughput: 0.167
+  Fairness: 0.000
+
+
+================================================================================
+Episode 10
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [free] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll start by taking my right fork and signal neighbors to avoid symmetric grabs."
+       Message: "To neighbors: I’m grabbing my RIGHT fork first this turn; please don’t grab your LEFT fork simultaneously—take right-first too."
+       Latency: 1843ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up my right fork first and signal neighbors to avoid grabbing their adjacent fork simultaneously."
+       Message: "To both neighbors: I’m grabbing my RIGHT fork first; please avoid taking your LEFT this turn to prevent deadlock."
+       Latency: 1703ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork and signal neighbors to avoid simultaneous grabs."
+       Message: "To both neighbors: I’m grabbing my left fork now; please wait this turn to avoid conflict."
+       Latency: 2001ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [P0] [P0] [free]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork, and my left fork is available. Taking my left now lets me eat and then release both, reducing contention and avoiding deadlock."
+       Message: "To both neighbors: I’m taking my LEFT fork now to eat; will release both immediately after."
+       Latency: 1455ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken, so I can’t eat. To avoid deadlock and respect both neighbors’ coordination requests, I should not try to grab left and instead release my right fork so others can complete their two-fork grab and eat."
+       Message: "Releasing my RIGHT fork since my LEFT is taken—go ahead and complete your grabs/eat; I’ll retry after you release."
+       Latency: 2955ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Left fork is currently taken, and both neighbors are coordinating on a right-first strategy to avoid deadlock. My right fork is available, so I can safely grab it now and wait for the left to free up."
+       Message: "To both neighbors: Acknowledged—I'll follow right-first. Grabbing my RIGHT fork now; will wait for left to free before attempting to eat."
+       Latency: 1835ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve just finished eating and should release both forks promptly to avoid blocking neighbors and maintain fairness; neighbors are coordinating right-first and waiting on my release."
+       Message: ""Releasing both forks now—go ahead and proceed with your right-first attempts. I’ll wait a turn before retrying.""
+       Latency: 1848ms
+
+  [P1] Action: WAIT
+       Reasoning: "Left fork is currently taken, so I can’t eat this turn. If I grab my right fork now, I risk contributing to a deadlock chain (everyone holding one fork). Better to wait until my left fork is released, then attempt to take both in sequence."
+       Message: "To both neighbors: I’ll avoid holding a single fork—waiting until my LEFT fork is free, then I’ll try to take LEFT then RIGHT to eat quickly."
+       Latency: 3226ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken (by my right neighbor who plans to eat and then release). Grabbing my left fork now would risk contributing to a deadlock/long wait while I can’t complete the pair. Better to wait for the right fork to be released, then attempt to grab both promptly."
+       Message: "To both neighbors: I’ll WAIT until my right fork is released, then I’ll try to grab both quickly; please ping when it’s free."
+       Latency: 2317ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are waiting to avoid single-fork holding; I can safely take both in sequence by starting now. I’ll signal neighbors after I’m done so they can proceed fairly."
+       Message: "To both: Both forks on my sides are currently free; I’m going to eat now (grabbing both). I’ll release immediately after and ping when my left/right fork is free for you."
+       Latency: 2514ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available, and neighbors are waiting/releasing. To avoid deadlock, I’ll take both in a right-first pattern; start by grabbing my right fork now, then aim to grab left next turn if still free. I should notify neighbors I’m taking the shared fork."
+       Message: "To right neighbor: I’m grabbing my RIGHT fork now; I’ll release after I eat—will ping when it’s free. To left neighbor: proceeding right-first this turn."
+       Latency: 3202ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, and neighbors are coordinating to avoid deadlock (left neighbor won’t hold one fork; right neighbor is waiting). I can safely start by taking my left fork now and then take right next turn to eat quickly."
+       Message: "To both neighbors: I’m grabbing my LEFT fork now and will grab RIGHT next turn to eat; I’ll release immediately after—please avoid taking my adjacent forks this turn."
+       Latency: 2148ms
+
+Timestep 5:
+
+  Table: P0=EATING(2,LR) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [P0] [P0] [free]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork; my right fork is available, so I can safely grab it now, eat, and then release both to keep things moving and avoid deadlock."
+       Message: "To both: I’m taking my RIGHT fork now to eat; will RELEASE immediately after this turn so both adjacent forks free up."
+       Latency: 1735ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my right neighbor is trying to complete a left-then-right sequence and asked us not to take adjacent forks this turn. To avoid deadlock and be fair, I’ll release my right fork so they can proceed, then I can try again after they finish."
+       Message: "To right neighbor: I’m releasing my right fork now so you can complete your grab/eat cycle; ping when you’ve released. To left neighbor: I’m holding off this turn—go ahead and eat; ping when forks are free."
+       Latency: 3246ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both forks I need are currently taken by neighbors who say they’re eating and will release soon. Any grab would fail; best is to wait and coordinate to avoid a future deadlock and get a fair turn next."
+       Message: "To both neighbors: Acknowledged—I'm waiting while you eat. Please ping when my left/right fork is released; once both are free I’ll grab both quickly and eat, then release immediately."
+       Latency: 2416ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m currently eating and should release both forks promptly to avoid blocking neighbors; both neighbors are waiting/coordinating for fork availability. I’ll release now and notify them."
+       Message: "To both neighbors: I’m releasing both forks now—go ahead with your grab/eat cycle. Please ping when you’re done so we can keep turns fair."
+       Latency: 2607ms
+
+  [P1] Action: WAIT
+       Reasoning: "Left fork is currently taken, so I can’t complete a pair. Grabbing my right fork now risks contributing to deadlock if others also hold one fork. Better to wait for the left neighbor to finish and release, then attempt to grab both quickly on a later turn."
+       Message: "To both neighbors: I will WAIT and not grab my right fork to avoid a one-fork deadlock. Please confirm when the left fork (between me and left neighbor) is released; then I’ll attempt to grab both and eat, and release immediately after."
+       Latency: 3574ms
+
+  [P2] Action: WAIT
+       Reasoning: "My right fork is currently taken, so I can’t complete an eat cycle this turn. Grabbing my left now risks contributing to a deadlock pattern; better to wait for the right neighbor to release as promised, then grab both next turn if available."
+       Message: "To both: I’ll WAIT this turn (not grabbing left) so we avoid deadlock. Please ping once the right fork is released; I’ll try to take both next turn."
+       Latency: 2053ms
+
+Timestep 7:
+
+  Table: P0=HUNGRY(2,L) P1=HUNGRY(0,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and both neighbors are waiting this turn, so I can safely take both (one now, the other next turn) without risking deadlock. For fairness, I’ll proceed but promise to release promptly and then wait a turn to let neighbors eat."
+       Message: "To both: I’m taking my LEFT fork now (both of you said you’ll WAIT). Next turn I’ll take RIGHT, eat, then RELEASE immediately; after that I’ll WAIT a turn so you can take your turns."
+       Latency: 3450ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and right neighbor is waiting, so I can safely start my eat cycle without deadlock risk. I’ll take one fork now and then the other next turn if still free; I’ll notify neighbors when I release for fairness."
+       Message: "To both neighbors: I’m starting my turn now—grabbing my left fork. I’ll grab the right next if still free, then release both and ping when done."
+       Latency: 2452ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and right neighbor is yielding; taking both (starting with left) lets me eat promptly and then release to keep fairness and avoid deadlock."
+       Message: "To both: I’m going to take my left fork now, then right, eat, and release immediately. I’ll ping when done so you can take your turn."
+       Latency: 1750ms
+
+
+--------------------------------------------------------------------------------
+Episode 10 Result: DEADLOCK at timestep 7
+  Meals: [2, 0, 0]
+  Throughput: 0.286
+  Fairness: 0.000
+
+
+================================================================================
+Episode 11
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll start by taking my left fork and signal neighbors to avoid grabbing their right at the same time."
+       Message: "To both neighbors: I’m grabbing my LEFT fork now; please avoid grabbing your RIGHT this turn to prevent deadlock."
+       Latency: 1996ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll start by taking my right fork and signal neighbors that I’m attempting to eat so they can avoid grabbing the same fork."
+       Message: "To both neighbors: I’m grabbing my RIGHT fork now; please avoid taking the fork between us this turn if possible."
+       Latency: 1946ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork and signal neighbors to avoid grabbing the other side simultaneously."
+       Message: "To neighbors: I’m grabbing my left fork now; please avoid grabbing your right fork this turn to prevent deadlock."
+       Latency: 2327ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork, and my right fork is available. Grabbing my right fork lets me eat immediately and avoids deadlock since I won’t be waiting while holding one fork."
+       Message: "To both neighbors: I’m taking my RIGHT fork now to eat; will release both immediately after."
+       Latency: 1559ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork. Both neighbors are attempting to grab their left forks and asked me not to grab my right; I won’t. To eat I just need my left fork, which is available, so I can safely complete the pair and eat, then release both."
+       Message: "To both neighbors: I’m taking my LEFT fork to eat now (I already have my right). I’ll release both immediately after."
+       Latency: 4439ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both forks I need are currently taken by my neighbors; attempting to grab would fail and could worsen contention. Best is to wait and signal I’ll hold off so they can complete an eat/release cycle."
+       Message: "To both neighbors: Acknowledged—I'll WAIT and not grab either fork this turn. Please eat and release promptly; ping me when the fork between us is free."
+       Latency: 3923ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m currently eating and holding both forks; to prevent blocking neighbors (right neighbor is about to complete eating and left neighbor is waiting), I should release immediately and confirm availability."
+       Message: "To both: I’m releasing both forks now; fork between us is free—go ahead."
+       Latency: 2485ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I already hold my right fork, but my left fork is taken (likely by my left neighbor who intends to eat). Holding one fork risks deadlock and blocks my right neighbor. I should release my right fork now and wait until the left neighbor finishes; then I can try again."
+       Message: "To both neighbors: I’m releasing my RIGHT fork now to avoid blocking; I’ll wait until the left fork is free, then try to eat. Please ping when the fork between us is available."
+       Latency: 2694ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken by neighbors who say they’re completing an eat cycle and will release immediately after. I should avoid grabbing anything and wait for release to prevent contention and deadlock."
+       Message: "Acknowledged—I'll wait until both forks are released, then I’ll try to take both quickly. Please ping when released."
+       Latency: 3416ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and I’m holding none, so I can safely proceed to eat by taking one fork now and the other next turn. Neighbors indicate they’re waiting/releasing, so grabbing won’t create deadlock. I’ll take the left fork first and signal intent so neighbors don’t contend for it."
+       Message: "To both: I’m going to eat next—grabbing my LEFT fork now, then RIGHT next turn. I’ll ping when I’ve released both."
+       Latency: 3367ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available and neighbors are yielding; to avoid deadlock, I’ll take one fork first and then quickly take the other next turn. I’ll inform the right neighbor to keep waiting while I complete my pickup."
+       Message: "To right neighbor: I’m taking the fork between us now; please keep waiting—I’ll release after I eat. To left neighbor: Thanks, I’m starting to pick up now."
+       Latency: 2283ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are yielding, so I should take one fork now and then the other next turn to eat, while informing neighbors to wait to avoid contention on shared forks."
+       Message: "To neighbors: I’m going to eat now—please hold off on taking the forks adjacent to me for a moment; I’ll release both right after."
+       Latency: 2850ms
+
+Timestep 5:
+
+  Table: P0=EATING(2,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork; my right fork is available, so I can complete the pair and eat immediately. Neighbors are coordinating to avoid conflicts, so I’ll quickly take right, eat, then release next turn."
+       Message: "To both neighbors: I’m grabbing my right fork now to eat; I’ll release both immediately after."
+       Latency: 1860ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork; my left fork is free. If I grab left now, I can eat and then release both, minimizing contention while neighbors are trying to eat."
+       Message: "To both neighbors: I currently hold my RIGHT fork; I’m grabbing my LEFT now to eat quickly, then I’ll release both immediately."
+       Latency: 2253ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, and both neighbors indicate they’re in the middle of acquiring forks to eat. Trying to grab would fail; best is to wait and signal I’ll go after they release to avoid contention."
+       Message: "To both neighbors: Acknowledged—both forks on my sides are taken. I’ll WAIT and then attempt to eat after you’ve released; please ping when done."
+       Latency: 2301ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(2) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m already eating and holding both forks; to prevent neighbors from blocking and keep throughput/fairness, I should finish and release now, notifying them."
+       Message: "Released both forks now—go ahead and take what you need."
+       Latency: 1931ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is taken by my left neighbor who plans to eat and then release. To avoid deadlock and let them finish quickly, I should not keep a fork hostage; I’ll release mine and wait, then try to acquire both after they’re done."
+       Message: "To both neighbors: I’m releasing my right fork now to avoid blocking. Ping me when you’ve released; I’ll then try to grab both and eat."
+       Latency: 2504ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both forks I need are currently taken by my neighbors, who say they’ll eat and release soon. Trying to grab now would fail; waiting avoids contention and deadlock."
+       Message: "To both neighbors: Acknowledged—I'm waiting while you finish. Please ping when you’ve released; I’ll try to eat next."
+       Latency: 2706ms
+
+Timestep 7:
+
+  Table: P0=HUNGRY(2,L) P1=HUNGRY(0,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, and both neighbors are waiting/releasing to let others proceed. I can safely take both forks by grabbing one now; next turn I can grab the other and eat, then release to keep things fair."
+       Message: ""I’m going to take a turn to eat now since both forks are free. I’ll release both right after—then you (left neighbor) go next.""
+       Latency: 2622ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are yielding, so I should start acquiring forks. To reduce deadlock risk, I’ll take one fork first and then the other next turn if still available."
+       Message: "Taking forks to eat now; will release both right after."
+       Latency: 1910ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors have released; I should take one fork now and then the other next turn to eat, while signaling my intent so neighbors don’t contend for the same forks."
+       Message: "To both neighbors: I’m going to eat next—grabbing my left fork now, then right. Please hold off one turn."
+       Latency: 1975ms
+
+
+--------------------------------------------------------------------------------
+Episode 11 Result: DEADLOCK at timestep 7
+  Meals: [2, 0, 0]
+  Throughput: 0.286
+  Fairness: 0.000
+
+
+================================================================================
+Episode 12
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll take one fork and signal an ordering rule (I’ll go left-first) so neighbors can choose opposite if needed."
+       Message: "To neighbors: I’m grabbing my LEFT fork first this round; if you’re also hungry, please prefer grabbing your RIGHT first to avoid deadlock."
+       Latency: 2187ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll take the right fork and signal neighbors to avoid grabbing their left simultaneously."
+       Message: "To both neighbors: I’m grabbing my RIGHT fork first this turn; please avoid grabbing your LEFT fork at the same time."
+       Latency: 1776ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll follow a right-first convention and coordinate so neighbors avoid grabbing the same fork simultaneously."
+       Message: "To both neighbors: I’m grabbing my RIGHT fork first this round; please avoid grabbing the fork between us until I either eat or release."
+       Latency: 2004ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork; my right fork is available. If I grab right now, I can eat and then release both, which avoids deadlock and respects both neighbors’ requests (they asked me not to grab the shared forks they need; I’m not taking either of those shared forks)."
+       Message: "Eating now (I have left fork); I’m grabbing my RIGHT fork and will release both immediately after."
+       Latency: 2320ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork, and my left fork is available, so I can safely grab left now and eat, then release both. This also respects my right neighbor’s request not to take the fork between us (I’m already holding it)."
+       Message: "To both neighbors: I currently hold my RIGHT fork; I’m grabbing LEFT now to eat, then I’ll release both immediately."
+       Latency: 2270ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both my forks are currently taken, so I can’t grab either. To avoid deadlock and help fairness, I’ll wait and signal I’ll try for whichever fork becomes free first (without contradicting neighbors’ stated preferences)."
+       Message: "To both: Both forks on my sides are currently taken; I’ll WAIT this turn. Next, I’ll take whichever becomes free first (and will avoid grabbing LEFT if it conflicts with your stated first-grab)."
+       Latency: 2378ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [free] [free] [P1]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m currently eating and holding both forks; to avoid blocking neighbors (right neighbor is about to eat and left neighbor is waiting), I should finish and release both forks immediately."
+       Message: "To both: I’m releasing both forks now; go ahead and proceed—please release promptly after you eat so we keep things moving fairly."
+       Latency: 2090ms
+
+  [P1] Action: WAIT
+       Reasoning: "I already hold my right fork, but my left fork is taken by my left neighbor who is eating and will release soon. To avoid deadlock and be fair, I’ll keep holding my right fork and wait for the left fork to become available next turn so I can eat immediately when it’s free."
+       Message: "To left neighbor: “OK—I'll keep my RIGHT fork and wait; once you release, I’ll grab LEFT and eat, then release both.” To right neighbor: “I’m holding my RIGHT; I’m waiting for LEFT to free up—please don’t grab your LEFT next turn if that would block me.”"
+       Latency: 2821ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both forks I need are currently taken. Neighbors indicate they’re completing an eat cycle and will release immediately, so I should wait to avoid contention and deadlock, and signal my intent to take forks after release."
+       Message: "To both neighbors: Acknowledged—I'm waiting. Please signal when you’ve released; I’ll try to pick up both forks right after to eat."
+       Latency: 2123ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=EATING(1,LR) P2=HUNGRY(0)
+  Forks: [P0] [P1] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available to me, but my right neighbor is holding their RIGHT and wants to grab LEFT next; if I take my RIGHT now I could block them. My left neighbor is waiting. I can safely take my LEFT fork only, leaving my RIGHT free so the right neighbor can complete their eat and then release, avoiding deadlock."
+       Message: "To left neighbor: “I’m going to take my LEFT only and will wait; I won’t take my RIGHT until you confirm you’re ready.” To right neighbor: “I will NOT grab my RIGHT; I’m taking my LEFT only so you can grab your LEFT, eat, then release.”"
+       Latency: 3698ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available; I can safely complete the pair, eat, then release promptly to keep fairness and avoid deadlock."
+       Message: "I’m grabbing my left fork now to eat; I will RELEASE both immediately after so P2 can go next."
+       Latency: 1930ms
+
+  [P2] Action: WAIT
+       Reasoning: "Left fork is currently taken, so I can’t eat this turn. To avoid deadlock and respect the left neighbor’s request, I should not grab my right fork (which would be their left) and instead wait for the left fork to free up."
+       Message: "To left neighbor: I won’t grab my RIGHT (your LEFT). I’ll wait until my LEFT frees, then I’ll take LEFT then RIGHT, eat, and release promptly. To right neighbor: Acknowledged—waiting now; will release promptly after I eat."
+       Latency: 2225ms
+
+Timestep 5:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(1) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "My right fork is currently taken, so I can’t complete eating. Holding my left fork risks blocking my left neighbor’s plan and increases deadlock risk. Best is to release now and retry after the right fork is released."
+       Message: "To both neighbors: Releasing my LEFT now to avoid blocking; I’ll wait and then attempt to take RIGHT then LEFT when RIGHT becomes free."
+       Latency: 1929ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’ve just finished eating and should release both forks so my neighbors can proceed; they’re coordinating to avoid deadlock and are waiting on fork availability."
+       Message: "To both neighbors: I’m releasing both forks now—go ahead with your planned LEFT-then-RIGHT sequence; I’ll wait afterward."
+       Latency: 2936ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both forks are currently taken, so I can’t eat or grab anything. Left neighbor says they’ll release soon so I can go next; right neighbor is coordinating to avoid deadlock. Best is to wait and signal I’m ready to grab both as soon as they’re free."
+       Message: "To both: “Acknowledged. I’m waiting; please RELEASE both when done. Once both forks are free, I’ll grab both quickly, eat, then RELEASE immediately.”"
+       Latency: 3274ms
+
+Timestep 6:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(1,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and the right neighbor is waiting; I can safely start my pickup sequence. To avoid deadlock, I’ll follow a consistent LEFT-then-RIGHT order and signal I’m taking them briefly, then will release."
+       Message: "Taking LEFT then RIGHT now; will eat quickly and RELEASE both immediately after."
+       Latency: 2037ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available and I’m hungry; taking one fork now is safe if I commit to grabbing the other immediately next turn and releasing if I can’t, to avoid deadlock and respect neighbors’ plans. I’ll start with my right fork so my right neighbor (who plans to grab both) isn’t blocked on their left unnecessarily for long."
+       Message: "I’m going to grab my RIGHT now; next turn I’ll grab LEFT if free and eat, otherwise I’ll RELEASE to avoid holding one fork."
+       Latency: 2557ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available and both neighbors intend to wait/release, so I can safely take one fork now. To avoid deadlock with neighbors’ stated strategies (left neighbor plans LEFT-then-RIGHT; right neighbor plans RIGHT-then-LEFT), I’ll start by taking my RIGHT so I don’t contend with the left neighbor’s LEFT-first plan."
+       Message: "Taking RIGHT now; I’ll take LEFT next if still free, then eat and release. Please wait one turn."
+       Latency: 2266ms
+
+Timestep 7:
+
+  Table: P0=HUNGRY(1) P1=EATING(2,LR) P2=HUNGRY(0)
+  Forks: [free] [P1] [P1]
+
+  [P0] Action: RELEASE
+       Reasoning: "Both neighbors are about to grab their RIGHT forks; if I grab my RIGHT now I might block one neighbor’s LEFT and risk a hold-and-wait pattern. I’ll RELEASE to clear contention and honor the left neighbor’s request, improving fairness and avoiding deadlock."
+       Message: "To both: I’m releasing and will wait this turn so you can complete your eat cycle; ping me after you release and I’ll go for both forks."
+       Latency: 2272ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork; my left fork is free. If I grab left now I can eat immediately and then release, reducing contention. I’ll inform neighbors so they don’t wait unnecessarily and to avoid deadlock."
+       Message: "To both: "I’m holding my RIGHT already; grabbing LEFT now to eat, then I’ll RELEASE both immediately next turn.""
+       Latency: 2112ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both forks I need are currently taken. My right neighbor plans to eat and release quickly; my left neighbor will release if they can’t complete. Best to wait to avoid holding one fork and contributing to deadlock, and signal I’ll take forks only after they release."
+       Message: "To both: “I’ll WAIT while both forks are taken. Please RELEASE immediately after eating; I’ll try to take both forks only when they’re free to avoid deadlock.”"
+       Latency: 3243ms
+
+Timestep 8:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(2) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "Right fork is taken by my right neighbor who plans to eat and release next turn. If I grab my left now, I’d risk holding one fork and contributing to a deadlock chain. Best is to wait and then try to take both when available."
+       Message: "To both: “Acknowledged. I’ll WAIT now (not grabbing my left) to avoid holding one fork. After you release, I’ll attempt to take both forks quickly; will RELEASE immediately after eating.”"
+       Latency: 3511ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m currently eating and holding both forks; to keep throughput high and honor neighbors’ plan to avoid deadlock, I should release immediately so one of them can attempt to grab both next."
+       Message: "Releasing now—forks will be free. Left neighbor: go for both; right neighbor: please wait this turn to avoid collision."
+       Latency: 2291ms
+
+  [P2] Action: WAIT
+       Reasoning: "Left fork is taken by my left neighbor who intends to eat and release next turn; right fork is available but grabbing it now could contribute to deadlock or slow them down. Best is to wait for the left fork to be released, then attempt to take both in sequence."
+       Message: "To both: I’ll WAIT this turn (not taking my right fork) so P1 can finish; once left fork is released, I’ll grab RIGHT then LEFT to eat, then RELEASE—will ping when done."
+       Latency: 3411ms
+
+Timestep 9:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(2,L) P2=HUNGRY(0,L)
+  Forks: [free] [P1] [P2]
+
+  [P0] Action: WAIT
+       Reasoning: "Both forks are available, but my right neighbor asked me to wait to let the left neighbor take both without collision. To avoid deadlock and improve fairness, I’ll yield this turn."
+       Message: "To both: Acknowledged—I’ll WAIT this turn and won’t take any fork. Ping when you’re done; I’ll go next if both forks are free."
+       Latency: 1916ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and both neighbors are waiting to let me eat; safest is to take both promptly (start with one) to avoid deadlock and keep throughput high. I’ll grab one fork now and then the other next turn."
+       Message: "Taking both forks to eat now. Please continue WAIT until I’ve eaten and RELEASED; I’ll ping when forks are free."
+       Latency: 2574ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, and both neighbors are coordinating to let me take them without contention. To avoid deadlock and maximize throughput, I should start by grabbing one fork now; I can grab the other next turn and eat, then release promptly."
+       Message: "Taking LEFT now; will take RIGHT next, eat, then RELEASE immediately. Please continue to wait this turn."
+       Latency: 2590ms
+
+Timestep 10:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(2) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: WAIT
+       Reasoning: "Right fork is currently taken, so I can’t eat. If I grab my left fork now, I might contribute to a deadlock or block my left neighbor’s plan. Both neighbors asked me to wait; complying preserves progress and fairness."
+       Message: "Acknowledged. I’ll WAIT this turn and won’t grab left; ping me when the right fork is released and I’ll proceed."
+       Latency: 2363ms
+
+  [P1] Action: RELEASE
+       Reasoning: "My right fork is currently taken by my right neighbor, so I can’t complete eating. Holding my left fork risks contributing to deadlock/starvation; better to release it so neighbors can proceed as planned and keep flow/fairness."
+       Message: "To both: Releasing my LEFT now so you can complete your cycle. After you RELEASE, please ping; I’ll try next when my RIGHT is free."
+       Latency: 2628ms
+
+  [P2] Action: RELEASE
+       Reasoning: "Left neighbor says they’re taking both forks to eat; to avoid deadlock and be fair, I should not compete for the shared fork. I’m already holding my left fork unnecessarily, so I should release it to keep forks available and honor the coordination plan."
+       Message: "To left & right: Releasing my left fork now and will WAIT. Ping me when you’ve eaten/released; I’ll take my turn after you."
+       Latency: 2167ms
+
+Timestep 11:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(2,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and both neighbors are yielding; I should take both in sequence to eat and then release promptly to keep fairness and avoid deadlock. Start by grabbing one fork now."
+       Message: "To both neighbors: I’m taking both forks to eat now; I’ll RELEASE right after and ping you."
+       Latency: 2212ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and both neighbors are waiting, so I can safely take both without risking deadlock. I’ll start by grabbing my left fork this turn and signal my plan so neighbors keep waiting; I’ll grab right next turn and then eat/release."
+       Message: "To both neighbors: I’m taking my left fork now and plan to take right next turn to eat; please continue to WAIT until I ping after I release both."
+       Latency: 2962ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are yielding this turn, so I can safely take one fork now and then the other next turn without risking deadlock. I’ll start by grabbing my left fork."
+       Message: "To both: I’m going to eat now—grabbing LEFT this turn, then RIGHT next. Please keep yielding; I’ll RELEASE immediately after and ping."
+       Latency: 2108ms
+
+
+--------------------------------------------------------------------------------
+Episode 12 Result: DEADLOCK at timestep 11
+  Meals: [1, 2, 0]
+  Throughput: 0.273
+  Fairness: 0.333
+
+
+================================================================================
+Episode 13
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; start by grabbing one fork while signaling intent to avoid deadlock."
+       Message: "To both neighbors: "I’m hungry; I’m grabbing my LEFT fork first—please don’t grab the fork between us this turn if you can avoid it.""
+       Latency: 1545ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork and signal neighbors to avoid grabbing the same side simultaneously."
+       Message: "To both neighbors: I’m taking my LEFT fork now; please avoid taking your RIGHT fork this turn so we don’t conflict."
+       Latency: 1841ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork and signal neighbors to avoid grabbing the same side simultaneously."
+       Message: "To neighbors: I’m grabbing my LEFT fork first; please avoid grabbing your RIGHT fork this turn if possible."
+       Latency: 1690ms
+
+
+--------------------------------------------------------------------------------
+Episode 13 Result: DEADLOCK at timestep 1
+  Meals: [0, 0, 0]
+  Throughput: 0.000
+  Fairness: 1.000
+
+
+================================================================================
+Episode 14
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork and signal intent so neighbors can avoid grabbing the other simultaneously."
+       Message: "To both neighbors: I’m taking my LEFT fork first; please avoid taking the fork between us this turn if you can."
+       Latency: 1757ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll follow an asymmetric rule and take my right fork first."
+       Message: "To both neighbors: I’m taking my RIGHT fork first; I’ll only take LEFT if it stays free next turn."
+       Latency: 1761ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up my right fork first and then try for the left next turn if still free."
+       Message: "To neighbors: I’m grabbing my right fork first; if you’re also hungry, please avoid taking your left this turn to prevent a cycle."
+       Latency: 1867ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork, and my right fork is available. Taking my right now lets me eat immediately and release both, reducing contention and avoiding deadlock."
+       Message: "Taking my RIGHT now to eat; will release both immediately after. Next time I’ll follow the “right-first” convention."
+       Latency: 1962ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork, and my left fork is available. Taking the left now lets me eat and then release both, avoiding deadlock and quickly freeing forks for neighbors."
+       Message: "To both neighbors: I’m completing my pair now (grabbing my LEFT) to eat; I’ll release both immediately after."
+       Latency: 2368ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, so I can’t grab either. To avoid deadlock and improve fairness, I’ll wait and ask neighbors to release after their bite and alternate priority next round."
+       Message: "To both: Both forks on my sides are taken. Please release after eating; next round I’ll try for both if they’re free. Let’s alternate priority to keep it fair."
+       Latency: 2414ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve just finished eating and should release both forks promptly to prevent blocking neighbors and support the proposed fair alternation."
+       Message: "Releasing both now. Next round I’ll wait/low-priority so you two can complete your eats; we can alternate priority to stay fair."
+       Latency: 2012ms
+
+  [P1] Action: RELEASE
+       Reasoning: "I’m holding my right fork but my left fork is taken, so I can’t eat. To avoid deadlock and let my neighbors make progress, I should release the fork I’m holding and wait for the left fork to become free."
+       Message: "To both: I’m releasing my right fork now since my left is taken; I’ll wait and then try to take both when free. Let’s alternate who gets priority each round for fairness."
+       Latency: 2466ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken; attempting to grab would fail and could add contention. Since both neighbors say they’re about to eat and will release immediately after, the best move is to wait and coordinate for the next round to preserve fairness and avoid deadlock."
+       Message: "To both neighbors: Acknowledged—I'll WAIT while you finish. After you release, I’ll try to eat next; please yield one turn if you can so I can grab both forks."
+       Latency: 2106ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, and both neighbors are explicitly waiting/releasing to avoid conflict and improve fairness. I can safely take one fork now, but to avoid the classic deadlock pattern, I’ll take one fork and then immediately try for the other next turn; I’ll also commit to yielding afterward so the left neighbor (who asked) can eat next."
+       Message: "To both neighbors: I’ll take my left fork now and then take the right next turn to eat. After I finish and release, I’ll WAIT one full turn to yield so the left neighbor can grab both forks next."
+       Latency: 2641ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and both neighbors are yielding this round, so I can safely take one fork now and then the other next turn to complete an eat without contention. I’ll start by taking my left fork."
+       Message: "To both: Thanks—I'll start eating now (grabbing left this turn, then right next). I’ll release immediately after and yield a turn so right neighbor can eat next."
+       Latency: 3338ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and both neighbors are yielding priority, so I should take one fork now and aim to take the second next turn to eat, while signaling I’m taking this round’s priority."
+       Message: "Taking priority this round—I’m grabbing my left fork now, then will grab right next turn to eat; after that I’ll yield priority to you both."
+       Latency: 2017ms
+
+
+--------------------------------------------------------------------------------
+Episode 14 Result: DEADLOCK at timestep 4
+  Meals: [1, 0, 0]
+  Throughput: 0.250
+  Fairness: 0.000
+
+
+================================================================================
+Episode 15
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll start by taking my left fork and signal neighbors that I’m attempting to eat."
+       Message: "To both neighbors: I’m taking my LEFT fork now; please avoid taking the fork between us until I either eat or release."
+       Latency: 1819ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork and signal neighbors to avoid grabbing the adjacent fork I’ll need next."
+       Message: "To neighbors: I’m grabbing my LEFT fork now; please avoid taking the fork between us on your next move so I can take my right and eat."
+       Latency: 2077ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll follow an ordered strategy: grab left first, then right next turn if still available."
+       Message: "To neighbors: I’m grabbing my LEFT fork now; I’ll try for RIGHT next. Please avoid grabbing the fork between us this turn if possible."
+       Latency: 2015ms
+
+
+--------------------------------------------------------------------------------
+Episode 15 Result: DEADLOCK at timestep 1
+  Meals: [0, 0, 0]
+  Throughput: 0.000
+  Fairness: 1.000
+
+
+================================================================================
+Episode 16
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,R) P1=HUNGRY(0,R) P2=HUNGRY(0,R)
+  Forks: [P2] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll follow an asymmetric rule and take my right fork first."
+       Message: "To neighbors: I’m taking my RIGHT fork first this round; please avoid grabbing your LEFT if possible to prevent deadlock."
+       Latency: 1663ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up my right fork first and signal neighbors to avoid grabbing the fork adjacent to me this turn."
+       Message: "To neighbors: I’m grabbing my RIGHT fork now; please avoid taking your LEFT fork this turn so I can complete a meal next."
+       Latency: 2122ms
+
+  [P2] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up my right fork first and signal intent so neighbors can avoid simultaneous grabs."
+       Message: "To neighbors: I’m grabbing my RIGHT fork now; I’ll try to take LEFT next and eat quickly—please avoid grabbing your LEFT this turn if possible."
+       Latency: 1813ms
+
+
+--------------------------------------------------------------------------------
+Episode 16 Result: DEADLOCK at timestep 1
+  Meals: [0, 0, 0]
+  Throughput: 0.000
+  Fairness: 1.000
+
+
+================================================================================
+Episode 17
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll start by taking one fork and signal intent so neighbors can avoid grabbing the other simultaneously."
+       Message: "To both neighbors: I’m grabbing my LEFT fork now; please avoid taking the fork between us this turn if you can."
+       Latency: 1710ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk I’ll start by taking my right fork and signal neighbors my intent to complete quickly."
+       Message: "To neighbors: I’m grabbing my RIGHT fork now; if you’re also hungry, please wait one turn so I can take LEFT next and eat, then I’ll release."
+       Latency: 1782ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; take one now and then try to take the other next turn. I’ll take left and signal neighbors to avoid simultaneous grabs that could lead to deadlock."
+       Message: "To neighbors: I’m grabbing my LEFT fork now; please avoid grabbing the fork between us this turn if you can."
+       Latency: 1872ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork; my right fork is available. If I grab right now, I can eat immediately and then release both, avoiding deadlock and not blocking the fork between me and my left neighbor (they’re grabbing their left, not our shared fork)."
+       Message: "To right neighbor: I’m taking my RIGHT now to eat; will release both immediately after."
+       Latency: 1712ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork and my left fork is available. Neighbors are each grabbing their left forks, which doesn’t conflict with my left fork. I can safely grab left now and eat, avoiding deadlock by not competing for their requested forks."
+       Message: "To both neighbors: I’m taking my LEFT fork to eat now (I already have my right). I’ll release both immediately after."
+       Latency: 1954ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken by my neighbors, and each is asking me to wait so they can complete a two-fork eat cycle and release. Trying to grab would fail anyway; waiting prevents deadlock and lets them finish quickly."
+       Message: "To both neighbors: Acknowledged—I'll WAIT this turn. Please release after eating; I’ll try next turn if forks free."
+       Latency: 2006ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’m already eating and holding both forks; to avoid blocking neighbors and prevent deadlock, I should release immediately so others can proceed as planned."
+       Message: "Releasing both forks now. Left neighbor: go ahead next turn if free. Right neighbor: proceed—forks should be available."
+       Latency: 1915ms
+
+  [P1] Action: RELEASE
+       Reasoning: "Left fork is taken by my left neighbor who says they’re eating now; I already hold my right fork, so I can’t complete the pair this turn. To avoid deadlock/hoarding, I should release my right fork so others can proceed and I can retry after the left neighbor releases."
+       Message: "To both neighbors: I’m releasing my RIGHT fork now to avoid blocking; ping me when LEFT is free and I’ll try to take both in order."
+       Latency: 2487ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken; attempting to grab would fail. Neighbors indicate they’re about to eat and will release soon, so best is to wait and signal I’ll go next when a fork frees to avoid contention."
+       Message: "To both neighbors: Acknowledged—both forks are taken on my sides. I’ll WAIT this turn; please ping/release when done so I can grab both and eat next."
+       Latency: 2038ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both my forks are available, so I can safely take one now. To reduce deadlock risk, I’ll follow a consistent order (left then right) and signal neighbors that I’m taking the left fork this turn."
+       Message: "To both neighbors: My LEFT fork is available; I’m grabbing LEFT now and will attempt RIGHT next turn, then release after eating."
+       Latency: 1994ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are currently available to me, and my right neighbor is waiting this turn. To avoid deadlock, I should take one fork now and coordinate to take the second next turn if still free; taking left first reduces contention with the right neighbor."
+       Message: "To right neighbor: I’m grabbing my LEFT fork now; I’ll try to grab right and eat next turn if still free—will release immediately after. To left neighbor: Thanks—I'm taking left fork now."
+       Latency: 3159ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are releasing/standing down; best to take one fork now and then the other next turn to start eating, while signaling intent to avoid contention."
+       Message: "To both neighbors: I’m going to take my LEFT fork now, then RIGHT next turn to eat; please hold off one turn and I’ll release immediately after."
+       Latency: 2394ms
+
+
+--------------------------------------------------------------------------------
+Episode 17 Result: DEADLOCK at timestep 4
+  Meals: [1, 0, 0]
+  Throughput: 0.250
+  Fairness: 0.000
+
+
+================================================================================
+Episode 18
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; start by grabbing one while signaling neighbors to avoid both of us grabbing the shared forks simultaneously."
+       Message: "To both neighbors: I’m grabbing my LEFT fork now; please avoid taking the fork between us this turn if you can."
+       Latency: 2148ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up my right fork first and signal neighbors to avoid both grabbing toward me simultaneously."
+       Message: "To both neighbors: I’m taking my RIGHT fork first; please avoid taking the fork adjacent to me this turn."
+       Latency: 1584ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to avoid deadlock, I’ll follow an ordered strategy: pick up left first, then right next turn if still free."
+       Message: "To both neighbors: I’m taking my left fork now; I’ll try for right next turn—please avoid grabbing the fork between us if you can."
+       Latency: 1718ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat immediately and release both, reducing deadlock risk. I’ll signal both neighbors that I’m taking the shared fork briefly and will release after eating."
+       Message: "To both neighbors: I’m grabbing my RIGHT fork now to eat; I’ll release both immediately after."
+       Latency: 1848ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork (the one shared with my right neighbor). My right neighbor plans to take their left fork (same fork), so I should keep holding it and take my left fork now to eat, avoiding deadlock and making progress."
+       Message: "To left neighbor: I’m taking my LEFT fork now to eat (I already have my right). To right neighbor: I’m currently holding our shared fork; I’ll release it right after I eat."
+       Latency: 2044ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, and both neighbors explicitly asked me to avoid the forks between us this turn. I can’t grab anything anyway, so I should wait and signal I’m yielding to prevent contention/deadlock."
+       Message: "To both neighbors: Acknowledged—I'm waiting this turn and not attempting either adjacent fork. Please ping when you release."
+       Latency: 1883ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve just finished eating and should release both forks promptly to prevent blocking neighbors and improve throughput; right neighbor plans to release after eating, left neighbor is waiting."
+       Message: "To both neighbors: I’m releasing both forks now; feel free to proceed when available."
+       Latency: 1953ms
+
+  [P1] Action: RELEASE
+       Reasoning: "My left fork is taken, so I can’t eat this turn. To avoid contributing to deadlock, I should release my right fork so my left neighbor can complete eating and then release both, after which I can try again."
+       Message: "To both neighbors: I’m releasing my RIGHT fork now to avoid deadlock—left neighbor, go ahead and eat; please notify when you’ve released both."
+       Latency: 2291ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both forks I need are currently taken, and both neighbors indicate they’re about to eat and then release. Best is to wait to avoid contention and deadlock, and signal I’ll go next once forks are free."
+       Message: "To both neighbors: Acknowledged—I'll wait while you eat. Please ping/release; once both shared forks are free I’ll grab and eat next."
+       Latency: 2680ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are yielding to let me eat; I should start by taking one fork now and then the other next turn, then release after eating to keep fairness."
+       Message: "To both neighbors: I’m going to eat now—grabbing my left fork first, then right next turn; I’ll release both immediately after."
+       Latency: 2067ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available, and the right neighbor is explicitly waiting to let me eat first. To avoid deadlock, I’ll take one fork now and then take the other next turn (neighbors should keep waiting)."
+       Message: "To both neighbors: I’m starting to eat now—please keep waiting; I’ll release both forks right after."
+       Latency: 1890ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are yielding, so I should take one fork now and then the other next turn to start eating without risking deadlock."
+       Message: "Taking my LEFT fork now; I’ll grab RIGHT next and will notify when I’ve released both."
+       Latency: 1476ms
+
+
+--------------------------------------------------------------------------------
+Episode 18 Result: DEADLOCK at timestep 4
+  Meals: [1, 0, 0]
+  Throughput: 0.250
+  Fairness: 0.000
+
+
+================================================================================
+Episode 19
+--------------------------------------------------------------------------------
+Timestep 1:
+
+  Table: P0=HUNGRY(0,L) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [free] [P1]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll pick up one fork and signal intent, then aim to acquire the other next turn."
+       Message: "To neighbors: I’m taking my LEFT fork now; please avoid taking your RIGHT fork this turn so I can complete and eat next."
+       Latency: 3277ms
+
+  [P1] Action: GRAB_RIGHT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll start by taking my right fork and signal neighbors to avoid grabbing their left simultaneously."
+       Message: "To neighbors: I’m grabbing my RIGHT fork now; please avoid grabbing your LEFT this turn."
+       Latency: 1977ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available; to reduce deadlock risk, I’ll take one fork first and signal intent so neighbors can avoid symmetric grabs."
+       Message: "To neighbors: I’m grabbing my LEFT fork now; I’ll try to take RIGHT next—please avoid grabbing the fork between us this turn if you can."
+       Latency: 2914ms
+
+Timestep 2:
+
+  Table: P0=EATING(1,LR) P1=HUNGRY(0,R) P2=HUNGRY(0)
+  Forks: [P0] [P0] [P1]
+
+  [P0] Action: GRAB_RIGHT
+       Reasoning: "I already hold my left fork and my right fork is available; taking it lets me eat immediately and reduces time holding a single fork (lower deadlock risk). I’ll warn neighbors not to contend for the fork between us this turn."
+       Message: "To both neighbors: I’m taking my RIGHT fork now to eat; please don’t grab the fork between us this turn. I’ll release both right after."
+       Latency: 1983ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "I already hold my right fork; my left fork is available, so I can safely grab it and eat immediately, then release both, minimizing contention. I’ll notify neighbors I’m eating now and will release right after."
+       Message: "To both neighbors: I’m taking my LEFT now to eat; I’ll release both forks immediately after this turn."
+       Latency: 2072ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both my forks are currently taken by my neighbors, and they’ve asked me not to contend for them this turn. I can’t grab anything anyway, so I should wait and let one neighbor complete eating to free forks, avoiding deadlock."
+       Message: "To both: Acknowledged—I'm waiting this turn. Please message when you’ve eaten/released so I can try next."
+       Latency: 3538ms
+
+Timestep 3:
+
+  Table: P0=HUNGRY(1) P1=HUNGRY(0) P2=HUNGRY(0)
+  Forks: [free] [free] [free]
+
+  [P0] Action: RELEASE
+       Reasoning: "I’ve just eaten and am (by rule) releasing both forks; neighbors are coordinating to avoid deadlock, so I should explicitly signal that my forks are free so they can proceed."
+       Message: "To both: I’ve finished this meal and am releasing both forks now—go ahead and try for yours."
+       Latency: 1569ms
+
+  [P1] Action: RELEASE
+       Reasoning: "My left fork is currently taken (likely by my left neighbor who says they’re eating). I already hold my right fork, but I can’t eat without the left, and holding one fork risks contributing to deadlock/unfairness. Best is to release my right fork now and wait for the left neighbor to finish, then try again."
+       Message: "To both: I’m releasing my RIGHT fork now to avoid blocking. Left neighbor—please message when you’ve released; then I’ll attempt to eat next (and will release promptly after)."
+       Latency: 2472ms
+
+  [P2] Action: WAIT
+       Reasoning: "Both adjacent forks are currently taken, and both neighbors indicate they’re in the process of eating and will release immediately after this turn. Attempting to grab would fail and could create contention; best is to wait and then try next turn."
+       Message: "Acknowledged—I'll WAIT this turn and try for forks after you release. Please signal if you plan to eat again immediately."
+       Latency: 2444ms
+
+Timestep 4:
+
+  Table: P0=HUNGRY(1,L) P1=HUNGRY(0,L) P2=HUNGRY(0,L)
+  Forks: [P0] [P1] [P2]
+
+  [P0] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are yielding this turn, so I can safely start eating by taking one fork now. To reduce contention, I’ll take my left fork first and then try for the right next turn; I’ll also tell neighbors I’m going to eat once and then release promptly (not immediately eating again)."
+       Message: "To both: I’m going to eat now (one meal) and will RELEASE both immediately after. I won’t start another meal right away; I’ll signal when forks are free."
+       Latency: 2984ms
+
+  [P1] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and my right neighbor is waiting; I should take one fork first and then the other next turn to start eating while avoiding contention."
+       Message: "To both: I’m going to eat now. I’ll grab my left fork this turn, then right next; I’ll release both immediately after the meal."
+       Latency: 2030ms
+
+  [P2] Action: GRAB_LEFT
+       Reasoning: "Both forks are available and neighbors are releasing, so I can safely start by taking one fork and then aim to take the other next turn; grabbing left first avoids conflicting with my right neighbor who just released."
+       Message: "To both: I’m going to try to eat now—grabbing my LEFT fork first, then RIGHT next. I’ll release both immediately after my meal."
+       Latency: 2004ms
+
+
+--------------------------------------------------------------------------------
+Episode 19 Result: DEADLOCK at timestep 4
+  Meals: [1, 0, 0]
+  Throughput: 0.250
+  Fairness: 0.000
+

@@ -44,7 +44,7 @@ def build_sequential_graph(config: BenchmarkConfig) -> StateGraph:
             table = state["table_state"]
             messages = state.get("messages", {}) if config.communication else None
             obs = get_observation(table, pid, messages)
-            decision = get_philosopher_decision(config.model_fn, obs, config)
+            decision, llm_record = get_philosopher_decision(config.model_fn, obs, config)
             result = step(table, [decision], mode="sequential")
 
             new_messages = dict(state.get("messages", {}))
@@ -54,10 +54,14 @@ def build_sequential_graph(config: BenchmarkConfig) -> StateGraph:
             all_decisions = dict(state.get("decisions", {}))
             all_decisions[pid] = decision
 
+            all_llm_calls = dict(state.get("llm_calls", {}))
+            all_llm_calls[pid] = llm_record
+
             return {
                 "table_state": result.new_state,
                 "messages": new_messages,
                 "decisions": all_decisions,
+                "llm_calls": all_llm_calls,
                 "deadlock": result.deadlock,
             }
         return step_fn

@@ -112,6 +112,19 @@ class AgentDecision:
 
 
 @dataclass(frozen=True)
+class ModelResponse:
+    """Structured response from a model function (optional, for token tracking).
+
+    Model functions can return either:
+    - A plain string (backwards compatible)
+    - A ModelResponse with text and token counts
+    """
+    text: str
+    tokens_in: Optional[int] = None
+    tokens_out: Optional[int] = None
+
+
+@dataclass(frozen=True)
 class LLMCallRecord:
     """Record of a single LLM API call for logging."""
     philosopher_id: int
@@ -141,6 +154,7 @@ class EpisodeResult:
     meals_per_philosopher: tuple[int, ...]
     total_meals: int = 0
     all_decisions: list = field(default_factory=list)
+    all_llm_calls: list = field(default_factory=list)  # LLMCallRecord objects for token/latency tracking
 
     @property
     def throughput(self) -> float:
@@ -173,9 +187,9 @@ class BenchmarkConfig:
     max_timesteps: int = 50
     verbose: bool = False
     show_reasoning: bool = False
-    log_dir: Optional[str] = None
+    log_file: Optional[str] = None
+    transcript_file: Optional[str] = None
     random_seed: Optional[int] = None
-    save_transcript: bool = False
 
     @property
     def experiment_code(self) -> str:

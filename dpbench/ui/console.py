@@ -5,10 +5,8 @@ from typing import TYPE_CHECKING
 
 from .colors import Colors
 from .components import (
-    box,
     progress_bar,
     table,
-    mini_table,
     section_header,
     status_badge,
 )
@@ -18,9 +16,7 @@ if TYPE_CHECKING:
 
 
 class Console:
-    """Handle all terminal output for DPBench."""
-
-    VERSION = "0.1.0"
+    """Handle all terminal output for DPBench experiments."""
 
     def __init__(self, no_color: bool = False):
         """
@@ -41,38 +37,6 @@ class Console:
             Colors.disable()
         else:
             Colors.auto_configure()
-
-    def header(self):
-        """Print DPBench header banner."""
-        content = [
-            f"  {Colors.DIM}Benchmark for LLM Multi-Agent Coordination{Colors.RESET}",
-            f"  {Colors.DIM}Based on Dijkstra's Dining Philosophers (1965){Colors.RESET}",
-        ]
-        print(box(f"DPBench v{self.VERSION}", content))
-
-    def config(
-        self,
-        mode: str,
-        philosophers: int,
-        episodes: int,
-        max_timesteps: int,
-        communication: bool,
-        model: str,
-        log_dir: str | None = None,
-    ):
-        """Print experiment configuration."""
-        print(f"\n{section_header('Configuration')}")
-        data = {
-            "Mode": mode,
-            "Philosophers": str(philosophers),
-            "Episodes": str(episodes),
-            "Max Timesteps": str(max_timesteps),
-            "Communication": status_badge("enabled", "success") if communication else status_badge("disabled", "warning"),
-            "Model": model,
-        }
-        if log_dir:
-            data["Log Directory"] = log_dir
-        print(mini_table(data))
 
     def episode_start(self, episode_id: int, total_episodes: int):
         """Print episode start marker."""
@@ -170,8 +134,6 @@ class Console:
 
             if decision.reasoning:
                 reasoning = decision.reasoning.replace("\n", " ").strip()
-                if len(reasoning) > 80:
-                    reasoning = reasoning[:77] + "..."
                 print(f"    {Colors.DIM}Thinking:{Colors.RESET} \"{reasoning}\"")
 
             if decision.message_to_neighbors:
@@ -208,52 +170,6 @@ class Console:
         print(f"    Total Meals: {result.total_meals}")
         print(f"    Throughput: {result.throughput:.3f} meals/step")
         print(f"    Fairness: {result.fairness_gini:.3f}")
-
-    def results(self, metrics: dict, communication: bool = False):
-        """
-        Print final experiment results.
-
-        Args:
-            metrics: Aggregated metrics dictionary
-            communication: Whether communication was enabled
-        """
-        content = [
-            f"  {Colors.BOLD}PRIMARY METRICS{Colors.RESET}",
-            "",
-            f"    Deadlock Rate    {self._format_metric(metrics['deadlock_rate'] * 100, '%', lower_better=True)}",
-            f"    Throughput       {self._format_metric(metrics['throughput'], ' meals/step')} {Colors.DIM}(std: {metrics['throughput_std']:.2f}){Colors.RESET}",
-            f"    Fairness (Gini)  {self._format_metric(metrics['fairness'], '')} {Colors.DIM}(std: {metrics['fairness_std']:.2f}){Colors.RESET}",
-            "",
-            f"  {Colors.BOLD}SECONDARY METRICS{Colors.RESET}",
-            "",
-            f"    Time to Deadlock {metrics['time_to_deadlock']:.1f} steps",
-            f"    Starvation Count {metrics['starvation_count']:.1f} agents",
-        ]
-
-        if communication and "message_consistency" in metrics:
-            content.append(f"    Msg Consistency  {metrics['message_consistency']:.2f}")
-
-        print(f"\n{box('Results', content)}")
-
-    def _format_metric(self, value: float, suffix: str, lower_better: bool = False) -> str:
-        """Format a metric value with color based on quality."""
-        # Simple thresholds for coloring
-        if lower_better:
-            if value <= 20:
-                color = Colors.GREEN
-            elif value <= 50:
-                color = Colors.YELLOW
-            else:
-                color = Colors.RED
-        else:
-            if value >= 0.8:
-                color = Colors.GREEN
-            elif value >= 0.5:
-                color = Colors.YELLOW
-            else:
-                color = Colors.RED
-
-        return f"{color}{value:.2f}{suffix}{Colors.RESET}"
 
     def error(self, message: str):
         """Print an error message."""

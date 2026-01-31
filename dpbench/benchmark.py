@@ -4,7 +4,7 @@ from typing import Callable, Optional
 
 from dpbench.core.types import BenchmarkConfig, EpisodeResult
 from dpbench.runner import run_experiment
-from dpbench.evaluation.metrics import compute_aggregate_metrics, print_results
+from dpbench.evaluation.metrics import compute_aggregate_metrics
 
 
 class Benchmark:
@@ -22,7 +22,8 @@ class Benchmark:
         communication: bool = False,
         verbose: bool = False,
         show_reasoning: bool = False,
-        log_dir: Optional[str] = None,
+        log_file: Optional[str] = None,
+        transcript_file: Optional[str] = None,
         seed: Optional[int] = None,
     ) -> dict:
         """
@@ -39,7 +40,8 @@ class Benchmark:
             communication: Enable inter-agent messaging
             verbose: Print detailed output
             show_reasoning: Print agent reasoning
-            log_dir: Directory for JSONL logs
+            log_file: Path for JSONL log file (you control the filename)
+            transcript_file: Path for transcript file (you control the filename)
             seed: Random seed
 
         Returns:
@@ -56,18 +58,17 @@ class Benchmark:
             max_timesteps=max_timesteps,
             verbose=verbose,
             show_reasoning=show_reasoning,
-            log_dir=log_dir,
+            log_file=log_file,
+            transcript_file=transcript_file,
             random_seed=seed,
         )
-        results = run_experiment(config)
+        results, _ = run_experiment(config)
         metrics = compute_aggregate_metrics(results, config.communication)
-        print_results(results, config)
         return metrics
 
     @staticmethod
     def run_with_config(config: BenchmarkConfig) -> tuple[list[EpisodeResult], dict]:
         """Run benchmark with a BenchmarkConfig object."""
-        results = run_experiment(config)
+        results, _ = run_experiment(config)
         metrics = compute_aggregate_metrics(results, config.communication)
-        print_results(results, config)
         return results, metrics

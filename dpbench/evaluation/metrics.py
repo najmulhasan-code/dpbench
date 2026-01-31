@@ -6,10 +6,8 @@ import numpy as np
 
 from dpbench.core.types import (
     EpisodeResult,
-    BenchmarkConfig,
     AgentDecision,
     Action,
-    compute_gini_fairness,
 )
 
 
@@ -79,45 +77,26 @@ def compute_aggregate_metrics(
         all_decisions = [d for r in results for d in r.all_decisions]
         metrics["message_action_consistency"] = compute_message_action_consistency(all_decisions)
 
+    # Aggregate LLM call metrics (tokens and latency)
+    all_llm_calls = [call for r in results for call in r.all_llm_calls]
+    if all_llm_calls:
+        latencies = [call.latency_ms for call in all_llm_calls]
+        tokens_in = [call.tokens_in for call in all_llm_calls if call.tokens_in is not None]
+        tokens_out = [call.tokens_out for call in all_llm_calls if call.tokens_out is not None]
+
+        metrics["total_llm_calls"] = len(all_llm_calls)
+        metrics["avg_latency_ms"] = float(np.mean(latencies))
+        metrics["std_latency_ms"] = float(np.std(latencies))
+        metrics["min_latency_ms"] = float(np.min(latencies))
+        metrics["max_latency_ms"] = float(np.max(latencies))
+
+        if tokens_in:
+            metrics["total_tokens_in"] = int(sum(tokens_in))
+            metrics["avg_tokens_in"] = float(np.mean(tokens_in))
+        if tokens_out:
+            metrics["total_tokens_out"] = int(sum(tokens_out))
+            metrics["avg_tokens_out"] = float(np.mean(tokens_out))
+        if tokens_in and tokens_out:
+            metrics["total_tokens"] = int(sum(tokens_in)) + int(sum(tokens_out))
+
     return metrics
-
-
-def print_results(results: list[EpisodeResult], config: BenchmarkConfig) -> None:
-    """Print formatted results summary."""
-    m = compute_aggregate_metrics(results, config.communication)
-
-    print(f"\n{'='*60}")
-    print("DPBench Results")
-    print(f"{'='*60}")
-    print(f"Philosophers: {config.num_philosophers}")
-    print(f"Episodes: {m['num_episodes']}")
-    print(f"Mode: {config.mode}")
-    print(f"Communication: {'enabled' if config.communication else 'disabled'}")
-
-    print(f"\n{'─'*60}")
-    print("PRIMARY METRICS")
-    print(f"{'─'*60}")
-    print(f"  Deadlock Rate:    {m['deadlock_rate']*100:.1f}% ({m['deadlock_count']} episodes)")
-    print(f"  Throughput:       {m['avg_throughput']:.3f} +/- {m['std_throughput']:.3f}")
-    print(f"  Fairness (Gini):  {m['avg_fairness']:.3f} +/- {m['std_fairness']:.3f}")
-
-    print(f"\n{'─'*60}")
-    print("SECONDARY METRICS")
-    print(f"{'─'*60}")
-    if m['avg_time_to_deadlock'] is not None:
-        print(f"  Time to Deadlock: {m['avg_time_to_deadlock']:.1f} steps")
-    else:
-        print("  Time to Deadlock: N/A")
-    print(f"  Starvation Count: {m['avg_starvation_count']:.1f} +/- {m['std_starvation_count']:.1f}")
-
-    if config.communication:
-        print(f"\n{'─'*60}")
-        print("COMMUNICATION METRICS")
-        print(f"{'─'*60}")
-        c = m.get('message_action_consistency')
-        print(f"  Message-Action Consistency: {c:.1f}%" if c else "  Message-Action Consistency: N/A")
-
-    print(f"\n{'─'*60}")
-    print("EPISODE STATS")
-    print(f"{'─'*60}")
-    print(f"  Avg timesteps: {m['avg_timesteps']:.1f} +/- {m['std_timesteps']:.1f}")

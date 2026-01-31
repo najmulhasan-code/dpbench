@@ -27,7 +27,10 @@ def _get_git_commit() -> str | None:
 
 
 class ExperimentLogger:
-    """JSONL logger for timestep-by-timestep experiment traces."""
+    """JSONL logger for timestep-by-timestep experiment traces.
+
+    User controls file paths directly - no auto-generated filenames.
+    """
 
     def __init__(self, config: BenchmarkConfig):
         self.config = config
@@ -35,26 +38,16 @@ class ExperimentLogger:
         self.transcript_path: Path | None = None
         self._names = _generate_philosopher_names(config.num_philosophers)
         self._start_time = datetime.now()
-        self._run_id: str | None = None
-        if config.log_dir:
-            self._init_log(config.log_dir)
 
-    def _init_log(self, log_dir: str) -> None:
+        if config.log_file:
+            self._init_log(config.log_file)
+        if config.transcript_file:
+            self._init_transcript(config.transcript_file)
+
+    def _init_log(self, log_file: str) -> None:
         """Initialize log file with header."""
-        path = Path(log_dir)
-        path.mkdir(parents=True, exist_ok=True)
-
-        # Generate run ID: {code}_{timestamp} e.g., sim5c_20260126_143000
-        timestamp = self._start_time.strftime("%Y%m%d_%H%M%S")
-        self._run_id = f"{self.config.experiment_code}_{timestamp}"
-
-        # All files share same base name for easy linking
-        self.log_path = path / f"{self._run_id}.jsonl"
-
-        # Initialize transcript file if enabled
-        if self.config.save_transcript:
-            self.transcript_path = path / f"{self._run_id}_transcript.txt"
-            self._write_transcript_header()
+        self.log_path = Path(log_file)
+        self.log_path.parent.mkdir(parents=True, exist_ok=True)
 
         self._write({
             "type": "header",
@@ -73,6 +66,12 @@ class ExperimentLogger:
                 "git_commit": _get_git_commit(),
             },
         })
+
+    def _init_transcript(self, transcript_file: str) -> None:
+        """Initialize transcript file."""
+        self.transcript_path = Path(transcript_file)
+        self.transcript_path.parent.mkdir(parents=True, exist_ok=True)
+        self._write_transcript_header()
 
     def _write(self, data: dict[str, Any]) -> None:
         """Append JSON line to log file."""
@@ -186,8 +185,6 @@ Config: {self.config.mode}, {self.config.num_philosophers} philosophers, communi
             lines.append(f"  [{self._names[i]}] Action: {d.action.value.upper()}")
             if d.reasoning:
                 reasoning = d.reasoning.replace("\n", " ").strip()
-                if len(reasoning) > 100:
-                    reasoning = reasoning[:97] + "..."
                 lines.append(f"       Reasoning: \"{reasoning}\"")
             if d.message_to_neighbors:
                 lines.append(f"       Message: \"{d.message_to_neighbors}\"")
@@ -250,7 +247,3 @@ Episode {episode_id} Result: {status} at timestep {total_timesteps}
     def get_transcript_path(self) -> Path | None:
         """Return transcript file path."""
         return self.transcript_path
-
-    def get_run_id(self) -> str | None:
-        """Return run ID for consistent file naming."""
-        return self._run_id

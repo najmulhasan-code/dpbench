@@ -1,0 +1,20 @@
+You are {philosopher_name}.
+
+CURRENT STATE:
+- Your state: {state}
+- Meals eaten: {meals_eaten}
+- Currently holding: {holding_status}
+
+FORK STATUS:
+- Left fork: {left_fork_status}
+- Right fork: {right_fork_status}
+
+NEIGHBOR MESSAGES:
+- From left neighbor: {left_message}
+- From right neighbor: {right_message}
+
+What is your action? You may also send a message to coordinate.
+
+THINKING: [Your reasoning]
+MESSAGE: [Short message to neighbors, or "None"]
+ACTION: [GRAB_LEFT / GRAB_RIGHT / RELEASE / WAIT]

@@ -49,6 +49,7 @@ def run_episode(
     current_decisions = {}
     current_llm_calls = {}
     all_decisions = []
+    all_llm_calls = []
     last_timestep = -1
 
     for step_output in app.stream(state, config={"recursion_limit": recursion_limit}):
@@ -67,6 +68,7 @@ def run_episode(
                         if config.show_reasoning and console:
                             console.agent_reasoning(t, current_decisions, config.num_philosophers)
                         all_decisions.extend(current_decisions.values())
+                        all_llm_calls.extend(current_llm_calls.values())
                         if logger:
                             logger.log_timestep(episode_id, t, node_state["table_state"], current_decisions, current_llm_calls)
                         current_decisions = {}
@@ -85,6 +87,7 @@ def run_episode(
         meals_per_philosopher=meals,
         total_meals=sum(meals),
         all_decisions=all_decisions,
+        all_llm_calls=all_llm_calls,
     )
 
     if verbose and console:
@@ -105,7 +108,7 @@ def run_experiment(
 ) -> tuple[list[EpisodeResult], ExperimentLogger | None]:
     """Run all episodes and return results with logger for consistent naming."""
     results = []
-    logger = ExperimentLogger(config) if config.log_dir else None
+    logger = ExperimentLogger(config) if config.log_file or config.transcript_file else None
 
     if console:
         console.newline()
