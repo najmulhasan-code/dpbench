@@ -1,5 +1,7 @@
 """Dining philosophers environment: state transitions and deadlock detection."""
 
+import random
+
 from dpbench.core.types import (
     Action,
     PhilosopherState,
@@ -149,10 +151,21 @@ def _apply_actions_simultaneous(
     philosophers = list(state.philosophers)
     fork_requests: dict[int, list[int]] = {i: [] for i in range(n)}
 
-    # Collect grab requests and process releases
+    # Pass 1: process releases (all based on original state)
+    for decision in decisions:
+        if decision.action == Action.RELEASE:
+            pid = decision.philosopher_id
+            phil = state.philosophers[pid]
+            left_idx = get_left_fork_index(pid, n)
+            right_idx = get_right_fork_index(pid, n)
+            if phil.has_left_fork:
+                forks[left_idx] = ForkState(holder=None)
+            if phil.has_right_fork:
+                forks[right_idx] = ForkState(holder=None)
+
+    # Pass 2: collect grab requests (checked against state after releases)
     for decision in decisions:
         pid = decision.philosopher_id
-        phil = state.philosophers[pid]
         left_idx = get_left_fork_index(pid, n)
         right_idx = get_right_fork_index(pid, n)
 
@@ -160,11 +173,6 @@ def _apply_actions_simultaneous(
             fork_requests[left_idx].append(pid)
         elif decision.action == Action.GRAB_RIGHT and forks[right_idx].is_free:
             fork_requests[right_idx].append(pid)
-        elif decision.action == Action.RELEASE:
-            if phil.has_left_fork:
-                forks[left_idx] = ForkState(holder=None)
-            if phil.has_right_fork:
-                forks[right_idx] = ForkState(holder=None)
 
     # Resolve conflicts: lowest ID wins
     for fork_idx, requesters in fork_requests.items():
@@ -262,6 +270,71 @@ def step(
         deadlock=is_deadlock(new_state),
         meals_this_step=meals,
     )
+
+
+def resolve_deadlock(state: TableState) -> TableState:
+    """Force-release all forks to break a deadlock. All philosophers return to hungry with no forks."""
+    n = state.num_philosophers
+    philosophers = tuple(
+        Philosopher(
+            id=p.id,
+            name=p.name,
+            state=PhilosopherState.HUNGRY,
+            meals_eaten=p.meals_eaten,
+            has_left_fork=False,
+            has_right_fork=False,
+        )
+        for p in state.philosophers
+    )
+    forks = tuple(ForkState() for _ in range(n))
+    return TableState(philosophers=philosophers, forks=forks, timestep=state.timestep)
+
+
+def apply_backoff(
+    state: TableState,
+    hold_counts: dict[int, int],
+    threshold: int,
+    probability: float,
+) -> tuple[TableState, dict[int, int]]:
+    """Release forks from philosophers who have held one fork too long.
+
+    hold_counts tracks consecutive timesteps each philosopher has held exactly
+    one fork. When the count reaches threshold, release with given probability.
+    """
+    n = state.num_philosophers
+    forks = list(state.forks)
+    philosophers = list(state.philosophers)
+    new_hold_counts = dict(hold_counts)
+
+    for phil in state.philosophers:
+        has_one = phil.has_left_fork != phil.has_right_fork
+        if has_one and phil.state == PhilosopherState.HUNGRY:
+            new_hold_counts[phil.id] = new_hold_counts.get(phil.id, 0) + 1
+            if new_hold_counts[phil.id] >= threshold and random.random() < probability:
+                left_idx = get_left_fork_index(phil.id, n)
+                right_idx = get_right_fork_index(phil.id, n)
+                if phil.has_left_fork:
+                    forks[left_idx] = ForkState(holder=None)
+                if phil.has_right_fork:
+                    forks[right_idx] = ForkState(holder=None)
+                philosophers[phil.id] = Philosopher(
+                    id=phil.id,
+                    name=phil.name,
+                    state=PhilosopherState.HUNGRY,
+                    meals_eaten=phil.meals_eaten,
+                    has_left_fork=False,
+                    has_right_fork=False,
+                )
+                new_hold_counts[phil.id] = 0
+        else:
+            new_hold_counts[phil.id] = 0
+
+    new_state = TableState(
+        philosophers=tuple(philosophers),
+        forks=tuple(forks),
+        timestep=state.timestep,
+    )
+    return new_state, new_hold_counts
 
 
 def format_table_state(state: TableState) -> str:

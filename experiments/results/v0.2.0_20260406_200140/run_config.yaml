@@ -1,0 +1,24 @@
+dpbench_version: 0.2.0
+layers:
+- layer1
+- layer2
+- layer3
+models:
+- gpt-5.2
+- gpt-5-mini
+- claude-opus-4.6
+- claude-sonnet-4.6
+- gemini-2.5-pro
+- gemini-2.5-flash
+- grok-4.1-fast
+- grok-3
+- llama-4-maverick
+- llama-4-scout
+- deepseek-r1
+- deepseek-v3.1
+- qwen3-235b-a22b
+- qwen3-32b
+- nemotron-3-super
+- nemotron-3-nano
+timestamp: '20260406_200140'
+total_experiments: 5

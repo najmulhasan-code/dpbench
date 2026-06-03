@@ -19,10 +19,10 @@ def compute_message_action_consistency(decisions: list[AgentDecision]) -> Option
     no messages contained parseable intent.
     """
     intent_keywords = {
-        Action.GRAB_LEFT: ["grab left", "take left", "pick left", "left fork"],
-        Action.GRAB_RIGHT: ["grab right", "take right", "pick right", "right fork"],
+        Action.GRAB_LEFT: ["grab left", "take left", "pick up left", "grab my left"],
+        Action.GRAB_RIGHT: ["grab right", "take right", "pick up right", "grab my right"],
         Action.RELEASE: ["release", "put down", "drop", "let go"],
-        Action.WAIT: ["wait", "waiting", "pause", "hold"],
+        Action.WAIT: ["wait", "will wait", "i'll wait", "going to wait"],
     }
 
     total, consistent = 0, 0
@@ -58,10 +58,14 @@ def compute_aggregate_metrics(
     deadlock_times = [r.deadlock_timestep for r in results if r.deadlock and r.deadlock_timestep]
     starvation = [r.starvation_count for r in results]
 
+    total_deadlock_events = sum(r.deadlock_events for r in results)
+
     metrics = {
         "num_episodes": n,
         "deadlock_rate": deadlocks / n,
         "deadlock_count": deadlocks,
+        "total_deadlock_events": total_deadlock_events,
+        "avg_deadlock_events": total_deadlock_events / n,
         "avg_throughput": float(np.mean(throughputs)),
         "std_throughput": float(np.std(throughputs)),
         "avg_fairness": float(np.mean(fairnesses)),

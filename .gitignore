@@ -1,20 +1,15 @@
-# Python
+# Python build artifacts
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
-.Python
 build/
 develop-eggs/
 dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
-parts/
 sdist/
-var/
 wheels/
 *.egg-info/
 .installed.cfg
@@ -39,62 +34,21 @@ Thumbs.db
 
 # Jupyter
 .ipynb_checkpoints/
-*.ipynb
 
-# Testing
+# Testing / linting caches
 .pytest_cache/
 .coverage
 htmlcov/
 .tox/
 .nox/
-
-# Type checking
 .mypy_cache/
 .dmypy.json
 dmypy.json
-
-# Linting
 .ruff_cache/
 
-# Environment
+# Secrets. Never commit.
 .env
 .env.local
-*.local
-
-# Data and outputs (generated)
-# Keep data/trained_q_table.json for reproducibility
-data/*.pt
-data/*.pth
-data/*.pkl
-models/*.json
-models/*.pt
-models/*.pth
-results/*.json
-results/*.csv
-outputs/
-logs/
-*.log
-checkpoints/
-
-# Figures (generated)
-figures/*.png
-figures/*.pdf
-figures/*.svg
-figures/*.eps
-
-# Model weights
-*.pkl
-*.pt
-*.pth
-*.bin
-*.safetensors
-
-# Experiment tracking
-wandb/
-mlruns/
-tensorboard/
-
-# Secrets
 *.key
 *.pem
 credentials.json

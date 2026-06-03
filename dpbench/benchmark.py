@@ -25,12 +25,16 @@ class Benchmark:
         log_file: Optional[str] = None,
         transcript_file: Optional[str] = None,
         seed: Optional[int] = None,
+        deadlock_terminal: bool = True,
+        communication_rounds: int = 1,
+        memory_window: int = 0,
+        backoff_threshold: int = 0,
+        backoff_probability: float = 0.5,
     ) -> dict:
-        """
-        Run benchmark and return metrics.
+        """Run benchmark and return metrics.
 
         Args:
-            model_fn: Function (system_prompt, user_prompt) -> str
+            model_fn: Function (system_prompt, user_prompt) -> str or ModelResponse
             system_prompt: System prompt text
             decision_prompt: Decision prompt template
             philosophers: Number of philosophers (>= 2)
@@ -40,12 +44,14 @@ class Benchmark:
             communication: Enable inter-agent messaging
             verbose: Print detailed output
             show_reasoning: Print agent reasoning
-            log_file: Path for JSONL log file (you control the filename)
-            transcript_file: Path for transcript file (you control the filename)
+            log_file: Path for JSONL log file
+            transcript_file: Path for transcript file
             seed: Random seed
-
-        Returns:
-            Dictionary of aggregate metrics.
+            deadlock_terminal: If False, recover from deadlock and continue
+            communication_rounds: Number of discussion rounds before action (requires communication=True)
+            memory_window: Number of past timesteps visible to agents (0 = memoryless)
+            backoff_threshold: Auto-release fork after this many steps holding one (0 = disabled)
+            backoff_probability: Probability of release when backoff triggers
         """
         config = BenchmarkConfig(
             model_fn=model_fn,
@@ -61,6 +67,11 @@ class Benchmark:
             log_file=log_file,
             transcript_file=transcript_file,
             random_seed=seed,
+            deadlock_terminal=deadlock_terminal,
+            communication_rounds=communication_rounds,
+            memory_window=memory_window,
+            backoff_threshold=backoff_threshold,
+            backoff_probability=backoff_probability,
         )
         results, _ = run_experiment(config)
         metrics = compute_aggregate_metrics(results, config.communication)

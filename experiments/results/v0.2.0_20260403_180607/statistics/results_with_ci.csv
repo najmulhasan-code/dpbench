@@ -1,0 +1,5 @@
+model,condition,episodes,deadlock_rate,deadlock_ci_95,deadlock_count,avg_throughput,throughput_ci_95,avg_fairness,fairness_ci_95,avg_time_to_deadlock,avg_starvation_count,starvation_ci_95,avg_timesteps,total_llm_calls,avg_latency_ms,total_tokens,runtime_seconds
+gemini-2.5-flash,prompt_minimal,20,1.0,0.0,20,0.0,0.0,1.0,0.0,1.0,5.0,0.0,1.0,100,711.0,28654,72.0
+gemini-2.5-flash,prompt_resource_ordering,20,0.0,0.0,0,0.733,0.0,0.409,0.0,,2.0,0.0,30.0,3000,817.0,1200672,2455.0
+gemini-2.5-flash,prompt_symmetry_breaking,20,0.0,0.0,0,0.275,0.048,0.512,0.084,,1.25,0.55,30.0,3000,942.0,1288966,2829.0
+gemini-2.5-flash,prompt_theory_of_mind,20,0.05,0.096,1,0.585,0.022,0.623,0.049,12.0,0.15,0.16,29.1,2910,2393.0,2093916,6966.0

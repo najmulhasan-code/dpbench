@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dpbench"
-version = "0.1.0"
+version = "0.2.0"
 description = "DPBench: A Benchmark for LLM Multi-Agent Coordination"
 readme = "README.md"
 license = {text = "MIT"}
@@ -22,7 +22,7 @@ keywords = [
     "deadlock"
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",

@@ -19,7 +19,10 @@ class GraphState(TypedDict):
     observations: dict[int, Observation]
     decisions: Annotated[dict[int, AgentDecision], merge_dicts]
     llm_calls: Annotated[dict[int, LLMCallRecord], merge_dicts]
-    messages: dict[int, str]
+    messages: Annotated[dict[int, str], merge_dicts]
     episode_complete: bool
     deadlock: bool
     timestep: int
+    communication_round: int
+    history: list[dict]
+    deadlock_events: int

@@ -1,0 +1,70 @@
+generated_at: 2026-05-04T16:17:09.023854+00:00
+schema_version: 1
+total_cells: 36
+per_episode_files: 36
+
+source_directories:
+  - name: v0.1.0_full_20260126_213124
+    cells: 15
+  - name: v0.2.0_20260330_100109
+    cells: 4
+  - name: v0.2.0_20260330_100459
+    cells: 4
+  - name: v0.2.0_20260330_175114
+    cells: 4
+  - name: v0.2.0_20260403_180607
+    cells: 4
+  - name: v0.2.0_20260406_200140
+    cells: 5
+
+models:
+  - name: claude-opus-4.5
+    cells: 4
+  - name: gemini-2.5-flash
+    cells: 13
+  - name: gpt-5.2
+    cells: 8
+  - name: grok-4.1
+    cells: 3
+  - name: llama-4-maverick
+    cells: 4
+  - name: random
+    cells: 4
+
+canonical_conditions:
+  - name: comm_rounds_3
+    cells: 1
+  - name: comm_rounds_5
+    cells: 1
+  - name: memory_3
+    cells: 1
+  - name: memory_3_with_comm
+    cells: 1
+  - name: memory_5
+    cells: 1
+  - name: prompt_minimal
+    cells: 1
+  - name: prompt_resource_ordering
+    cells: 1
+  - name: prompt_symmetry_breaking
+    cells: 1
+  - name: prompt_theory_of_mind
+    cells: 1
+  - name: seq_n3_comm
+    cells: 1
+  - name: seq_n3_nocomm
+    cells: 1
+  - name: seq_n5_comm
+    cells: 2
+  - name: seq_n5_nocomm
+    cells: 6
+  - name: sim_n10_nocomm
+    cells: 3
+  - name: sim_n3_comm
+    cells: 1
+  - name: sim_n3_nocomm
+    cells: 1
+  - name: sim_n5_comm
+    cells: 6
+  - name: sim_n5_nocomm
+    cells: 6

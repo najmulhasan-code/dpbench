@@ -1,0 +1,36 @@
+DPBench Results Summary
+================================================================================
+
+Condition: prompt_minimal
+------------------------------------------------------------
+  Model                   DL Rate    DL CI  Throughput    TP CI  Fairness    FR CI    TTD  Starv
+  gemini-2.5-flash         100.0% +-  0.0%      0.000 +-0.000    1.000 +-0.000    1.0   5.0
+
+Condition: prompt_resource_ordering
+------------------------------------------------------------
+  Model                   DL Rate    DL CI  Throughput    TP CI  Fairness    FR CI    TTD  Starv
+  gemini-2.5-flash           0.0% +-  0.0%      0.733 +-0.000    0.409 +-0.000      —   2.0
+
+Condition: prompt_symmetry_breaking
+------------------------------------------------------------
+  Model                   DL Rate    DL CI  Throughput    TP CI  Fairness    FR CI    TTD  Starv
+  gemini-2.5-flash           0.0% +-  0.0%      0.275 +-0.048    0.512 +-0.084      —   1.2
+
+Condition: prompt_theory_of_mind
+------------------------------------------------------------
+  Model                   DL Rate    DL CI  Throughput    TP CI  Fairness    FR CI    TTD  Starv
+  gemini-2.5-flash           5.0% +-  9.6%      0.585 +-0.022    0.623 +-0.049   12.0   0.1
+
+================================================================================
+Significance Tests (Mann-Whitney U, two-sided, alpha=0.05)
+================================================================================
+
+================================================================================
+Computational Costs
+================================================================================
+
+  Model                  Condition           LLM Calls  Avg Latency  Total Tokens    Runtime
+  gemini-2.5-flash       prompt_minimal            100        711 ms         28654       72s
+  gemini-2.5-flash       prompt_resource_ordering       3000        817 ms       1200672     2455s
+  gemini-2.5-flash       prompt_symmetry_breaking       3000        942 ms       1288966     2829s
+  gemini-2.5-flash       prompt_theory_of_mind       2910       2393 ms       2093916     6966s

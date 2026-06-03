@@ -1,48 +1,197 @@
-conditions:
-  sim5nc:
+# Layer 1: Universality — all 17 models, 30 episodes each
+layer1:
+  sim_n5_nocomm:
     mode: simultaneous
     communication: false
     philosophers: 5
-    description: "Simultaneous, 5 philosophers, no communication"
+    episodes: 30
+    max_timesteps: 30
 
-  sim5c:
+  sim_n5_comm:
     mode: simultaneous
     communication: true
     philosophers: 5
-    description: "Simultaneous, 5 philosophers, with communication"
+    episodes: 30
+    max_timesteps: 30
 
-  seq5nc:
+  sim_n10_nocomm:
+    mode: simultaneous
+    communication: false
+    philosophers: 10
+    episodes: 30
+    max_timesteps: 30
+
+  sim_n10_comm:
+    mode: simultaneous
+    communication: true
+    philosophers: 10
+    episodes: 30
+    max_timesteps: 30
+
+  seq_n5_nocomm:
     mode: sequential
     communication: false
     philosophers: 5
-    description: "Sequential, 5 philosophers, no communication"
+    episodes: 30
+    max_timesteps: 30
 
-  seq5c:
+  seq_n10_nocomm:
     mode: sequential
+    communication: false
+    philosophers: 10
+    episodes: 30
+    max_timesteps: 30
+
+# Layer 2: Scaling — 4 models, 20 episodes each
+# Models: gpt-5.2, claude-opus-4.6, llama-4-maverick, qwen3-235b
+layer2:
+  sim_n7_nocomm:
+    mode: simultaneous
+    communication: false
+    philosophers: 7
+    episodes: 20
+    max_timesteps: 30
+
+  sim_n15_nocomm:
+    mode: simultaneous
+    communication: false
+    philosophers: 15
+    episodes: 20
+    max_timesteps: 30
+
+  sim_n20_nocomm:
+    mode: simultaneous
+    communication: false
+    philosophers: 20
+    episodes: 20
+    max_timesteps: 30
+
+  seq_n15_nocomm:
+    mode: sequential
+    communication: false
+    philosophers: 15
+    episodes: 20
+    max_timesteps: 30
+
+# Layer 3: Ablations — gpt-5.2 and claude-opus-4.6, 20 episodes each
+# Base condition: sim_n5_nocomm unless noted
+layer3:
+  prompt_symmetry_breaking:
+    mode: simultaneous
+    communication: false
+    philosophers: 5
+    episodes: 20
+    max_timesteps: 30
+    prompt_variant: symmetry_breaking
+
+  prompt_theory_of_mind:
+    mode: simultaneous
+    communication: false
+    philosophers: 5
+    episodes: 20
+    max_timesteps: 30
+    prompt_variant: theory_of_mind
+
+  prompt_resource_ordering:
+    mode: simultaneous
+    communication: false
+    philosophers: 5
+    episodes: 20
+    max_timesteps: 30
+    prompt_variant: resource_ordering
+
+  prompt_minimal:
+    mode: simultaneous
+    communication: false
+    philosophers: 5
+    episodes: 20
+    max_timesteps: 30
+    prompt_variant: minimal
+
+  temp_0.3:
+    mode: simultaneous
+    communication: false
+    philosophers: 5
+    episodes: 20
+    max_timesteps: 30
+    temperature: 0.3
+
+  temp_1.0:
+    mode: simultaneous
+    communication: false
+    philosophers: 5
+    episodes: 20
+    max_timesteps: 30
+    temperature: 1.0
+
+  temp_1.5:
+    mode: simultaneous
+    communication: false
+    philosophers: 5
+    episodes: 20
+    max_timesteps: 30
+    temperature: 1.5
+
+  memory_3:
+    mode: simultaneous
+    communication: false
+    philosophers: 5
+    episodes: 20
+    max_timesteps: 30
+    memory_window: 3
+
+  memory_5:
+    mode: simultaneous
+    communication: false
+    philosophers: 5
+    episodes: 20
+    max_timesteps: 30
+    memory_window: 5
+
+  comm_rounds_3:
+    mode: simultaneous
     communication: true
     philosophers: 5
-    description: "Sequential, 5 philosophers, with communication"
+    episodes: 20
+    max_timesteps: 30
+    communication_rounds: 3
 
-  sim3nc:
-    mode: simultaneous
-    communication: false
-    philosophers: 3
-    description: "Simultaneous, 3 philosophers, no communication"
-
-  sim3c:
+  comm_rounds_5:
     mode: simultaneous
     communication: true
-    philosophers: 3
-    description: "Simultaneous, 3 philosophers, with communication"
+    philosophers: 5
+    episodes: 20
+    max_timesteps: 30
+    communication_rounds: 5
 
-  seq3nc:
-    mode: sequential
+  nonterminal_deadlock:
+    mode: simultaneous
     communication: false
-    philosophers: 3
-    description: "Sequential, 3 philosophers, no communication"
+    philosophers: 5
+    episodes: 20
+    max_timesteps: 100
+    deadlock_terminal: false
 
-  seq3c:
-    mode: sequential
+  randomized_backoff:
+    mode: simultaneous
+    communication: false
+    philosophers: 5
+    episodes: 20
+    max_timesteps: 30
+    backoff_threshold: 2
+    backoff_probability: 0.5
+
+  memory_3_with_comm:
+    mode: simultaneous
     communication: true
-    philosophers: 3
-    description: "Sequential, 3 philosophers, with communication"
+    philosophers: 5
+    episodes: 20
+    max_timesteps: 30
+    memory_window: 3
+
+  long_episodes_100:
+    mode: simultaneous
+    communication: false
+    philosophers: 5
+    episodes: 20
+    max_timesteps: 100

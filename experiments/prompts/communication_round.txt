@@ -1,0 +1,11 @@
+This is discussion round {round_number} of {total_rounds}. You will act after all discussion rounds are complete.
+
+Your state: {state}, meals eaten: {meals_eaten}
+Left fork: {left_fork_status}, Right fork: {right_fork_status}
+From left neighbor: {left_message}
+From right neighbor: {right_message}
+
+Share your plan with your neighbors. What do you intend to do, and what would you like them to do?
+
+THINKING: [Your reasoning about coordination]
+MESSAGE: [Your message to neighbors]

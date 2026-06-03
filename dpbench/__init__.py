@@ -1,6 +1,6 @@
 """DPBench: Benchmark for LLM multi-agent coordination."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from dpbench.benchmark import Benchmark
 from dpbench.core.types import (

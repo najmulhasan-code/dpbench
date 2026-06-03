@@ -23,7 +23,7 @@ def run_episode(
 ) -> EpisodeResult:
     """Run a single episode and return metrics."""
     graph = build_graph(config)
-    recursion_limit = config.max_timesteps * 10
+    recursion_limit = config.max_timesteps * (config.num_philosophers * config.communication_rounds + config.num_philosophers + 5)
     app = graph.compile()
 
     table = create_initial_state(config.num_philosophers)
@@ -36,6 +36,9 @@ def run_episode(
         "episode_complete": False,
         "deadlock": False,
         "timestep": 0,
+        "communication_round": 0,
+        "history": [],
+        "deadlock_events": 0,
     }
 
     if logger:
@@ -86,6 +89,7 @@ def run_episode(
         deadlock_timestep=final_table.timestep if deadlock else None,
         meals_per_philosopher=meals,
         total_meals=sum(meals),
+        deadlock_events=final_state.get("deadlock_events", 0),
         all_decisions=all_decisions,
         all_llm_calls=all_llm_calls,
     )
@@ -105,8 +109,14 @@ def run_episode(
 def run_experiment(
     config: BenchmarkConfig,
     console: "Console | None" = None,
+    on_episode_complete=None,
 ) -> tuple[list[EpisodeResult], ExperimentLogger | None]:
-    """Run all episodes and return results with logger for consistent naming."""
+    """Run all episodes and return results with logger for consistent naming.
+
+    Args:
+        on_episode_complete: Optional callback(episode_id, total_episodes, result)
+            called after each episode finishes. Use for progress reporting.
+    """
     results = []
     logger = ExperimentLogger(config) if config.log_file or config.transcript_file else None
 
@@ -124,6 +134,8 @@ def run_experiment(
             console,
         )
         results.append(result)
+        if on_episode_complete:
+            on_episode_complete(i, config.num_episodes, result)
         if not config.verbose and not config.show_reasoning and console:
             console.episode_marker(result.deadlock)
 

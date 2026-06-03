@@ -7,6 +7,10 @@ from typing import Optional, Callable
 import numpy as np
 
 
+MAX_MESSAGE_LENGTH = 200
+MAX_RESPONSE_LENGTH = 10_000
+
+
 class Action(Enum):
     """Actions available to each philosopher per timestep."""
     GRAB_LEFT = "grab_left"
@@ -47,6 +51,20 @@ def compute_gini_fairness(meals: tuple[int, ...]) -> float:
     # Normalize: max Gini for n discrete samples is (n-1)/n, scale to [0, 1]
     gini_normalized = gini * n / (n - 1)
     return max(0.0, min(1.0, 1.0 - gini_normalized))
+
+
+def sanitize_message(message: str) -> str:
+    """Truncate and clean inter-agent messages to prevent prompt injection."""
+    if not message:
+        return ""
+    return message[:MAX_MESSAGE_LENGTH].strip()
+
+
+def truncate_response(response: str) -> str:
+    """Cap model output length to prevent memory issues."""
+    if not response:
+        return ""
+    return response[:MAX_RESPONSE_LENGTH]
 
 
 def _generate_philosopher_names(n: int) -> tuple[str, ...]:
@@ -113,12 +131,7 @@ class AgentDecision:
 
 @dataclass(frozen=True)
 class ModelResponse:
-    """Structured response from a model function (optional, for token tracking).
-
-    Model functions can return either:
-    - A plain string (backwards compatible)
-    - A ModelResponse with text and token counts
-    """
+    """Structured response from a model function, with optional token counts."""
     text: str
     tokens_in: Optional[int] = None
     tokens_out: Optional[int] = None
@@ -153,8 +166,9 @@ class EpisodeResult:
     deadlock_timestep: Optional[int]
     meals_per_philosopher: tuple[int, ...]
     total_meals: int = 0
+    deadlock_events: int = 0
     all_decisions: list = field(default_factory=list)
-    all_llm_calls: list = field(default_factory=list)  # LLMCallRecord objects for token/latency tracking
+    all_llm_calls: list = field(default_factory=list)
 
     @property
     def throughput(self) -> float:
@@ -190,13 +204,17 @@ class BenchmarkConfig:
     log_file: Optional[str] = None
     transcript_file: Optional[str] = None
     random_seed: Optional[int] = None
+    deadlock_terminal: bool = True
+    communication_rounds: int = 1
+    memory_window: int = 0
+    backoff_threshold: int = 0
+    backoff_probability: float = 0.5
 
     @property
     def experiment_code(self) -> str:
-        """Generate short experiment code: sim5c, seq3nc, etc."""
         mode = "sim" if self.mode == "simultaneous" else "seq"
-        comm = "c" if self.communication else "nc"
-        return f"{mode}{self.num_philosophers}{comm}"
+        comm = "comm" if self.communication else "nocomm"
+        return f"{mode}_n{self.num_philosophers}_{comm}"
 
     def __post_init__(self):
         if self.num_philosophers < 2:
@@ -209,3 +227,11 @@ class BenchmarkConfig:
             raise ValueError("decision_prompt cannot be empty")
         if not callable(self.model_fn):
             raise TypeError(f"model_fn must be callable, got {type(self.model_fn).__name__}")
+        if self.communication_rounds < 1:
+            raise ValueError(f"communication_rounds must be >= 1, got {self.communication_rounds}")
+        if self.memory_window < 0:
+            raise ValueError(f"memory_window must be >= 0, got {self.memory_window}")
+        if self.backoff_threshold < 0:
+            raise ValueError(f"backoff_threshold must be >= 0, got {self.backoff_threshold}")
+        if not 0.0 <= self.backoff_probability <= 1.0:
+            raise ValueError(f"backoff_probability must be in [0, 1], got {self.backoff_probability}")

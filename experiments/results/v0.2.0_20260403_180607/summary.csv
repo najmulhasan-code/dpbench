@@ -1,0 +1,5 @@
+model,condition,mode,communication,philosophers,episodes,deadlock_rate,avg_throughput,avg_fairness,avg_time_to_deadlock,avg_starvation_count,total_deadlock_events,message_action_consistency,total_tokens,avg_latency_ms,runtime_seconds,dpbench_version
+gemini-2.5-flash,prompt_minimal,simultaneous,False,5,20,1.0,0.0,1.0,1.0,5.0,0,,28654,710.5802219954785,71.564982,0.2.0
+gemini-2.5-flash,prompt_resource_ordering,simultaneous,False,5,20,0.0,0.7333333333333332,0.40909090909090917,,2.0,0,,1200672,816.6723316011485,2454.829108,0.2.0
+gemini-2.5-flash,prompt_symmetry_breaking,simultaneous,False,5,20,0.0,0.275,0.511701146076146,,1.25,0,,1288966,941.5910077659258,2829.068675,0.2.0
+gemini-2.5-flash,prompt_theory_of_mind,simultaneous,False,5,20,0.05,0.5849999999999999,0.6225885792913656,12.0,0.15,0,,2093916,2392.732158487565,6965.792332,0.2.0

@@ -1,0 +1,6 @@
+model,condition,mode,communication,philosophers,episodes,deadlock_rate,avg_throughput,avg_fairness,avg_time_to_deadlock,avg_starvation_count,total_deadlock_events,message_action_consistency,total_tokens,avg_latency_ms,runtime_seconds,dpbench_version
+gemini-2.5-flash,comm_rounds_5,simultaneous,True,5,20,0.05,0.5316666666666666,0.6406619797041623,1.0,0.5,0,75.82857142857144,1700689,1890.1755680204508,9853.733133,0.2.0
+gemini-2.5-flash,memory_3,simultaneous,False,5,20,0.85,0.14625,0.8957401315789474,1.8235294117647058,3.95,0,,321874,1040.6761593404726,630.598885,0.2.0
+gemini-2.5-flash,memory_3_with_comm,simultaneous,True,5,20,0.8,0.16833333333333333,0.9317363261093912,3.125,3.6,0,63.38028169014085,604223,1744.70404082334,1484.94309,0.2.0
+gemini-2.5-flash,memory_5,simultaneous,False,5,20,0.9,0.2722219085262564,0.7555608974358974,7.944444444444445,3.15,0,,646421,1044.140137338052,1061.342164,0.2.0
+gemini-2.5-flash,comm_rounds_3,simultaneous,True,5,20,0.0,0.5566666666666666,0.6919276131505233,,0.25,0,76.22576966932725,1804483,2567.999020833173,13397.003477,0.2.0

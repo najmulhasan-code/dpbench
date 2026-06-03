@@ -1,0 +1,17 @@
+{
+  "simultaneous_vs_sequential_n5": {
+    "u_statistic": 4.0,
+    "p_value": 0.22067136191984682,
+    "significant": false
+  },
+  "communication_vs_no_communication_n5": {
+    "u_statistic": 3.0,
+    "p_value": 0.6666666666666666,
+    "significant": false
+  },
+  "n5_vs_n10_simultaneous": {
+    "u_statistic": 4.0,
+    "p_value": 0.3333333333333333,
+    "significant": false
+  }
+}
