@@ -10,7 +10,7 @@
 
 [![arXiv](https://img.shields.io/badge/arXiv-2602.13255-b31b1b.svg)](https://arxiv.org/abs/2602.13255)
 [![PyPI version](https://img.shields.io/pypi/v/dpbench.svg)](https://pypi.org/project/dpbench/)
-[![Python](https://img.shields.io/pypi/pyversions/dpbench.svg)](https://pypi.org/project/dpbench/)
+[![Downloads](https://static.pepy.tech/badge/dpbench)](https://pepy.tech/project/dpbench)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Overview
