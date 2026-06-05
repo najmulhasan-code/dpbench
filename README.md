@@ -3,9 +3,12 @@
 **A benchmark for evaluating coordination in multi-agent LLM systems under simultaneous resource contention.**
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/najmulhasan-code/dpbench/main/experiments/figures/teaser.png" alt="DPBench" width="720"/>
+  <a href="https://arxiv.org/abs/2602.13255">
+    <img src="https://raw.githubusercontent.com/najmulhasan-code/dpbench/main/experiments/figures/teaser.png" alt="DPBench" width="720"/>
+  </a>
 </p>
 
+[![arXiv](https://img.shields.io/badge/arXiv-2602.13255-b31b1b.svg)](https://arxiv.org/abs/2602.13255)
 [![PyPI version](https://img.shields.io/pypi/v/dpbench.svg)](https://pypi.org/project/dpbench/)
 [![Python](https://img.shields.io/pypi/pyversions/dpbench.svg)](https://pypi.org/project/dpbench/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -13,6 +16,8 @@
 ## Overview
 
 DPBench adapts the Dining Philosophers problem into a controlled testbed where the action protocol, the communication structure, and the group size each vary independently. Each episode reports four metrics (deadlock rate, throughput, fairness, message-action consistency) with Wilson and *t*-based 95% confidence intervals. On a single model, the benchmark captures what changes when the protocol changes.
+
+Read the full [paper](https://arxiv.org/abs/2602.13255) on arXiv.
 
 ## Installation
 
@@ -74,7 +79,19 @@ Experiments are configured by [`experiments/configs/conditions.yaml`](experiment
 
 ## Citation
 
-A BibTeX entry will be added here when the accompanying paper is published.
+If you use DPBench in your work, please cite:
+
+```bibtex
+@misc{hasan2026dpbenchstructuraldeterminantsmultiagent,
+      title={DPBench: Structural Determinants of Multi-Agent LLM Coordination Under Simultaneous Resource Contention},
+      author={Najmul Hasan and Prashanth BusiReddyGari},
+      year={2026},
+      eprint={2602.13255},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2602.13255},
+}
+```
 
 ## License
 
